@@ -27,16 +27,13 @@ typedef zCVecStruct * zCVec;
 #define zCVecSetSize(v,s)       ( _zCVecSize(v) = (s) )
 #define zCVecSizeIsEqual(v1,v2) ( _zCVecSize(v1) == _zCVecSize(v2) )
 
-/* METHOD:
- * zCVecElem, zCVecSetElem
- * - abstract and set vector element.
+/*! \brief abstract and set vector element.
  *
- * 'zCVecElem()' returns the 'i'th component of a vector
- * 'v'. 'zCVecSetElem()' sets the 'i'th component of 'v'
- * for a scalar value 'value'.
- * [RETURN VALUE]
- * 'zCVecElem()' and 'zCVecSetElem()' return the 'i'th
- * component of 'v'.
+ * zCVecElem() returns the \a i th component of a vector \a v.
+ * zCVecSetElem() sets the \a i th component of \a v for a
+ * scalar value \a value.
+ * \return
+ * zCVecElem() and zCVecSetElem() return the \a i th component of \a v.
  */
 #define zCVecElem(v,n)      ( &(v)->elem[n] )
 #define zCVecSetElem(v,n,e) zComplexCopy( (e), zCVecElem(v,n) )
@@ -47,34 +44,34 @@ typedef zCVecStruct * zCVec;
  * - allocate, free, cleanup and copy vector.
  *
  * 'zCVecAlloc()' allocates memory for a new vector with 'size' components.
- * #
+ *
  * 'zCVecFree()' destroys the given vector 'v', freeing
  * the memory allocated.
- * #
+ *
  * 'zCVecClear()' clears the vector 'v', set all of the
  * components for zero.
- * #
+ *
  * 'zCVecCopyNC()' copies the vector 'src' to the other
  * 'dest' without checking the size consistency between 'src'
  * and 'dest'.
- * #
+ *
  * 'zCVecCopy()' copies the vector 'src' to the other 'dest'.
- * #
+ *
  * 'zCVecClone()' creates a clone of the vector 'src'.
  * 's' is the size of the array.
- * [RETURN VALUE]
+ * \return
  * 'zCVecAlloc()' and 'zCVecClone()' return a pointer to the newly
  * created vector.
- * #
+ *
  * 'zCVecFree()' returns no values.
- * #
+ *
  * 'zCVecClear()' returns a pointer 'v'.
- * #
+ *
  * 'zCVecCopyNC()' returns a pointer 'dest'.
- * #
+ *
  * 'zCVecCopy()' returns a pointer 'dest', or the null
  * pointer if the size of 'src' and 'dest' do not coincide.
- * [NOTES]
+ * \notes
  * Since 'zCVecCopyNC()' does not check the size
  * consistency, when the size of 'src' and 'dest' are
  * different from each other, anything might happen.
@@ -92,12 +89,10 @@ __EXPORT zCVec zVec2CVec(zVec v, zCVec cv);
 
 /* METHOD:
  * zCVecIsEqual - compare two vectors.
- * [SYNOPSIS]
- * bool zCVecIsEqual(zCVec v1, zCVec v2);
- * [DESCRIPTION]
+ *
  * 'zCVecIsEqual()' sees if the given two vector 'v1' and
  * 'v2' are equal to each other.
- * [RETURN VALUE]
+ * \return
  * 'zCVecIsEqual()' returns the true value if 'v1' equals
  * to 'v2', or the false value otherwise.
  */
@@ -107,14 +102,13 @@ __EXPORT bool zCVecIsEqual(zCVec v1, zCVec v2);
  * zCVecIsTol, zCVecIsTiny
  * - test if tiny vector.
  *
- * [DESCRIPTION]
  * 'zCVecIsTol()' returns the true value if all the
  * components of the vector 'v' are less than 'tol', or the
  * false value otherwise.
  * 'zCVecIsTiny()' is the same with 'zCVecIsTol()'
  * except it compares each component with zTOL(defined in
- * "cure_misc.h") instead of 'tol'.
- * [RETURN VALUE]
+ * 'zeda_misc.h') instead of 'tol'.
+ * \return
  * 'zCVecIsTol()' and 'zCVecIsTiny()' return results as a boolean value.
  */
 __EXPORT bool zCVecIsTol(zCVec v, double tol);
@@ -127,40 +121,39 @@ __EXPORT bool zCVecIsTol(zCVec v, double tol);
  * zCVecAddDRC, zCVecSubDRC, zCVecRevDRC, zCVecMulDRC, zCVecDivDRC,
  * - basic arithmetics for vector.
  *
- * [DESCRIPTION]
  * 'zCVecAddNC()' and 'zCVecAdd()' add the two vectors,
  * 'v1' and 'v2', and put the result into 'v'.
- * #
+ *
  * 'zCVecSubNC()' and 'zCVecSub()' subtract 'v2' from
  * 'v1', and put the result into 'v'.
- * #
+ *
  * 'zCVecRevNC()' and 'zCVecRev()' reverse 'v1', and put
  * the result into 'v'.
- * #
+ *
  * 'zCVecMulNC()' and 'zCVecMul()' multiply 'v1' by a
  * scalar value 'k', and put the result into 'v'.
- * #
+ *
  * 'zCVecDivNC()' and 'zCVecDiv()' divide 'v1' by 'k',
  * and put the result into 'v'.
- * #
+ *
  * 'zCVecAddNCDRC()' and 'zCVecAddDRC()' directly add
  * 'v2' to 'v1'.
- * #
+ *
  * 'zCVecSubNCDRC()' and 'zCVecSubDRC()' directly
  * subtract 'v2' from 'v1'.
- * #
+ *
  * 'zCVecRevNCDRC()' and 'zCVecRevDRC()' directly reverse
  * 'v'.
- * #
+ *
  * 'zCVecMulNCDRC()' and 'zCVecMulDRC()' directly
  * multiply 'v' by 'k'.
- * #
+ *
  * 'zCVecDivNCDRC()' and 'zCVecDivDRC()' directly divide
  * 'v' by 'k'.
- * [RETURN VALUE]
+ * \return
  * Each of all these functions returns a pointer to
  * the result.
- * [NOTES]
+ * \notes
  * The type of NC functions do not check the size
  * consistency. If it is not urgent and you are not
  * hasty, you should not use them.
@@ -197,14 +190,13 @@ __EXPORT zCVec zCVecCat(zCVec v1, zComplex *z, zCVec v2, zCVec v);
  * zCVecInnerProdNC, zCVecInnerProd
  * - inner product of vector.
  *
- * [DESCRIPTION]
  * 'zCVecInnerProdNC()' and 'zCVecInnerProd()'
  * calculates the inner products of the two vector,
  * 'v1' and 'v2'.
- * [RETURN VALUE]
+ * \return
  * 'zCVecInnerProdNC()' and 'zCVecInnerProd()'
  * return the inner products calculated.
- * [NOTES]
+ * \notes
  * 'zCVecInnerProdNC()' does not check the size
  * consistency between 'v1' and 'v2'. If it is not urgent
  * and you are not hasty, you should use 'zCVecInnerProd()'.
@@ -216,19 +208,18 @@ __EXPORT zComplex *zCVecInnerProd(zCVec v1, zCVec v2, zComplex *z);
  * zCVecSqrNorm, zCVecNorm, zCVecNormalize, zCVecNormalizeDRC,
  * - normalize vector.
  *
- * [DESCRIPTION]
  * 'zCVecSqrNorm()' calculates the squared norm of the
  * vector 'v'. And 'zCVecNorm()' calculates the norm
  * of 'v'.
- * #
+ *
  * 'zCVecNormalize()' normalizes the vector 'src',
  * dividing by the norm of itself, and put the result
  * into 'dest'.
  * 'zCVecNormalizeDRC()' directly normalizes the
  * vector 'v'.
- * [RETURN VALUE]
+ * \return
  * 'zCVecSqrNorm()' and 'zCVecNorm()' return the value calculated.
- * #
+ *
  * Each of 'zCVecNormalize()' and 'zCVecNormalizeDRC()'
  * returns the pointer to the result.
  */

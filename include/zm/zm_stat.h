@@ -82,11 +82,27 @@ __EXPORT double zPoissonDistrib(int x, double lambda);
 
 /*! \brief binomial distribution function.
  *
- * zBinDistrib() calculates binomial distribution
- * defined by \a n and \a p as:
+ * zBinDistrib() calculates binomial distribution defined by \a n
+ * and \a p as:
  *  \a n_C_\a x*\a p^\a x*(1-\a p)^(\a n-\a x).
  */
 __EXPORT double zBinDistrib(int x, int n, double p);
+
+/*! \brief chi-squared distribution.
+ *
+ * zChi2Distrib() calculates chi-squared distribution defined by
+ * \a x and \a k, where \a x is the chi-squared value and \a k is
+ * the degree.
+ */
+__EXPORT double zChi2Distrib(double x, int k);
+
+/*! \brief chi-squared cumulative distribution.
+ *
+ * zChi2CumDistrib() calculates chi-squared cumulative distribution
+ * defined by \a x and \a k, where \a x is the chi-squared value and
+ * \a k is the degree.
+ */
+__EXPORT double zChi2CumDistrib(double x, int k);
 
 /* basic statistics computation */
 

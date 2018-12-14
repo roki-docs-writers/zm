@@ -162,8 +162,7 @@ _zLP_PDIP_PC *_zLP_PDIP_PCAlloc(_zLP_PDIP_PC *pc, zVec b, zVec c)
   pc->dx2 = zVecAlloc( zVecSizeNC(c) );
   pc->dy2 = zVecAlloc( zVecSizeNC(b) );
   pc->dz2 = zVecAlloc( zVecSizeNC(c) );
-  if( !pc->dx || !pc->dy || !pc->dz ||
-      !pc->dx2 || !pc->dy2 || !pc->dz2 ){
+  if( !pc->dx || !pc->dy || !pc->dz || !pc->dx2 || !pc->dy2 || !pc->dz2 ){
     ZALLOCERROR();
     _zLP_PDIP_PCFree( pc );
     return NULL;
@@ -251,41 +250,44 @@ void _zLP_PDIP_PCCorrect(_zLP_PDIP *dat, _zLP_PDIP_PC *pc, double ap, double ad,
  * - linear programming solver based on primal-dual interior-point
  *   method with Mehrotra s predictor-corrector.
  */
+#define ZM_LPSOLVE_PDIP_PCSTEP_MUL 0.99
 bool zLPSolvePDIP_PC(zMat a, zVec b, zVec c, zVec x, double *cost)
 {
   _zLP_PDIP dat;
   _zLP_PDIP_PC pc;
   double e, ap, ad;
   bool ret = false;
-	int cnt = 0;
+  int iter = 0;
+  register int i;
 
   if( !_zLP_PDIPAlloc( &dat, a, b, c, x ) ) goto TERMINATE2;
   if( !_zLP_PDIP_PCAlloc( &pc, b, c ) ) goto TERMINATE1;
   _zLP_PDIPIni( &dat );
-  while( 1 ){
+  ZITERINIT( iter );
+  for( i=0; i<iter; i++ ){
     e = _zLP_PDIP_PCErr( &dat );
-    if( zVecIsTiny(dat.v1) && zVecIsTiny(dat.v2) && zIsTiny(e) ) break;
+    if( zVecIsTiny(dat.v1) && zVecIsTiny(dat.v2) && zIsTiny(e) ) goto TERMINATE0;
     if( !_zLP_PDIPEqLUDecomp( &dat ) ) goto TERMINATE1;
     /* predictor */
     _zLP_PDIPEqLU( &dat, dat.v1, dat.v2, dat.v3, pc.dx, pc.dy, pc.dz );
     ap = _zLP_PDIP_PCStep( dat.x, pc.dx );
     ad = _zLP_PDIP_PCStep( dat.z, pc.dz );
-    if( zIsTiny(ap) && zIsTiny(ad) ) break;
+    if( zIsTiny(ap) && zIsTiny(ad) ) goto TERMINATE0;
     _zLP_PDIP_PCCorrect( &dat, &pc, ap, ad, e );
     /* corrector */
     _zLP_PDIPEqLU( &dat, NULL, NULL, dat.v3, pc.dx2, pc.dy2, pc.dz2 );
     zVecAddNCDRC( pc.dx, pc.dx2 );
     zVecAddNCDRC( pc.dy, pc.dy2 );
     zVecAddNCDRC( pc.dz, pc.dz2 );
-    if( ( ap = 0.99*_zLP_PDIP_PCStep( dat.x, pc.dx ) ) > 1 ) ap = 1;
-    if( ( ad = 0.99*_zLP_PDIP_PCStep( dat.z, pc.dz ) ) > 1 ) ad = 1;
-    if( zIsTiny(ap) && zIsTiny(ad) ) break;
+    if( ( ap = ZM_LPSOLVE_PDIP_PCSTEP_MUL * _zLP_PDIP_PCStep( dat.x, pc.dx ) ) > 1 ) ap = 1;
+    if( ( ad = ZM_LPSOLVE_PDIP_PCSTEP_MUL * _zLP_PDIP_PCStep( dat.z, pc.dz ) ) > 1 ) ad = 1;
+    if( zIsTiny(ap) && zIsTiny(ad) ) goto TERMINATE0;
     zVecCatNCDRC( dat.x, ap, pc.dx );
     zVecCatNCDRC( dat.y, ad, pc.dy );
     zVecCatNCDRC( dat.z, ad, pc.dz );
-		cnt++;
-		if( cnt == 10000 ) break;
   }
+  ZITERWARN( iter );
+ TERMINATE0:
   zVecTouchup( x );
   ret = true;
  TERMINATE1:

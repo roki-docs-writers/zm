@@ -287,7 +287,12 @@ zVec zVecSwap(zVec v, int i1, int i2)
  */
 int _zVecSortCmp(void *p1, void *p2, void *priv)
 {
-  return *(double *)p1 - *(double *)p2;
+  double d;
+
+  d = ((double *)priv)[*(int*)p1] - ((double *)priv)[*(int*)p2];
+  if( d > 0 ) return 1;
+  if( d < 0 ) return -1;
+  return 0;
 }
 
 /* zVecSort
@@ -295,23 +300,11 @@ int _zVecSortCmp(void *p1, void *p2, void *priv)
  */
 void zVecSort(zVec v, zIndex idx)
 {
-  double **vp;
-  register int i;
-
   if( zVecSizeNC(v) != zArrayNum(idx) ){
     ZRUNERROR( ZM_ERR_SIZMIS_VEC );
     return;
   }
-  if( !( vp = zAlloc( double*, zVecSizeNC(v) ) ) ){
-    ZALLOCERROR();
-    return;
-  }
-  for( i=0; i<zVecSizeNC(v); i++ )
-    vp[i] = &zVecElem(v,i);
-  zQuickSort( (void **)vp, zVecSizeNC(v), _zVecSortCmp, NULL );
-  for( i=0; i<zVecSizeNC(v); i++ )
-    zIndexSetElem( idx, i, vp[i]-zVecBuf(v) );
-  zFree( vp );
+  zQuickSort( zArrayBuf(idx), zArrayNum(idx), sizeof(int), _zVecSortCmp, zVecBuf(v) );
 }
 
 /* zVecIsEqual

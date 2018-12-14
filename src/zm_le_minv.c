@@ -190,6 +190,9 @@ zMat _zMulInvMat(zMat m1, zMat m2, zMat m, zIndex idx, zVec s)
   return m;
 }
 
+/* zMulInvMatMatNC
+ * - multiplication of inverse matrix and matrix without checking sizes.
+ */
 zMat _zMulInvMatMatNC(zMat m1, zMat m2, zMat m)
 /* m = m1^-1 m2 */
 {
@@ -221,7 +224,7 @@ zMat zMulInvMatMat(zMat m1, zMat m2, zMat m)
     ZRUNERROR( ZM_ERR_NONSQR_MAT );
     return NULL;
   }
-  if( zMatColSize(m1)!=zMatRowSize(m2) || !zMatSizeIsEqual(m2,m) ){
+  if( zMatColSize(m1) != zMatRowSize(m2) || !zMatSizeIsEqual(m2,m) ){
     ZRUNERROR( ZM_ERR_SIZMIS_MAT );
     return NULL;
   }
@@ -268,31 +271,26 @@ zMat zMulMatInvMat(zMat m1, zMat m2, zMat m)
   return m;
 }
 
-
 /* zMatInv
  * - inverse matrix.
  */
 zMat zMatInv(zMat m, zMat im)
 {
-	/* zMatIdentNC( im ); */
-	/* return zMulInvMatMat( m, im, im ); */
-	if( !zMatIsSqr(m) ){
+  if( !zMatIsSqr(m) ){
     ZRUNERROR( ZM_ERR_NONSQR_MAT );
     return NULL;
   }
-  if( zMatColSize(m)!=zMatRowSize(im) ){
+  if( zMatColSize(m) != zMatRowSize(im) ){
     ZRUNERROR( ZM_ERR_SIZMIS_MAT );
     return NULL;
   }
-	switch( zMatColSize(m) ){
-	case 1:
-		im->elem[0] = 1.0 / m->elem[0];
-		break;
-	default:
-		zMatIdentNC( im );
-		_zMulInvMatMatNC( m, im, im );
-	}
-	return im;
+  if( zMatColSize(m) == 1 ){ /* scalar case */
+    im->elem[0] = 1.0 / m->elem[0];
+  } else{
+    zMatIdentNC( im );
+    _zMulInvMatMatNC( m, im, im );
+  }
+  return im;
 }
 
 /* zMatInvHotelling

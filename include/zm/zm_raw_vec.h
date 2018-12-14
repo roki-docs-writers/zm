@@ -11,42 +11,38 @@
 
 __BEGIN_DECLS
 
-/* METHOD:
- * zRawVecClear, zRawVecTouchup, zRawVecCopy
- * - cleanup and copy raw vector.
+/*! \brief cleanup and copy raw vector.
  *
- * 'zRawVecClear()' clears a vector 'v', setting all
+ * zRawVecClear() clears a vector \a v, setting all
  * components for zeros.
- * #
- * 'zRawVecTouchup()' touches up 'v', namely, replace
+ *
+ * zRawVecTouchup() touches up \a v, namely, replace
  * all components which are less than zTOL for zeros.
- * #
- * 'zRawVecCopy()' copies a vector 'src' to 'dest'.
- * #
- * 'size' is the size of vector.
- * [RETURN VALUE]
- * 'zRawVecClear()' returns a pointer to 'v'.
- * #
- * 'zRawVecTouchup()' returns no value.
- * #
- * 'zRawVecCopy()' returns a pointer to 'dest'.
+ *
+ * zRawVecCopy() copies a vector \a src to \a dest.
+ *
+ * \a size is the size of vector.
+ * \return
+ * zRawVecClear() returns a pointer to \a v.
+ *
+ * zRawVecTouchup() returns no value.
+ *
+ * zRawVecCopy() returns a pointer to \a dest.
  */
 #define zRawVecClear(v,siz)      memset( v, 0, sizeof(double)*(siz) )
 __EXPORT void zRawVecTouchup(double *v, int size);
 #define zRawVecCopy(src,dst,siz) memcpy( dst, src, sizeof(double)*(siz) )
 
-/* METHOD:
- * zRawVecGet, zRawVecPut
- * - get/put a part of raw vector.
+/*! \brief get/put a part of raw vector.
  *
- * 'zRawVecGet()' partly copies 'src' to 'dest' from
- * the 'pos'th component. 'zRawVecPut()' copies 'dest'
- * to a part of 'src' from the 'pos'th component.
+ * zRawVecGet() partly copies \a src to \a dest from
+ * the \a pos'th component.
+ * zRawVecPut() copies \a dest to a part of \a src from
+ * the \a pos'th component.
  * For both functions, the number of components copied
- * is 'size'.
- * [RETURN VALUE]
- * 'zRawVecGet()' and 'zRawVecPut()' return a pointer
- * to 'dest'.
+ * is \a size.
+ * \return
+ * zRawVecGet() and zRawVecPut() return a pointer to \a dest.
  */
 #define zRawVecGet(src,pos,dst,siz) zRawVecCopy( (src)+(pos), dst, siz )
 #define zRawVecPut(dst,pos,src,siz) zRawVecCopy( src, (dst)+(pos), siz )

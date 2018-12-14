@@ -9,7 +9,7 @@
 #ifndef __ZM_MISC_H__
 #define __ZM_MISC_H__
 
-#include <cure/cure.h>
+#include <zeda/zeda.h>
 #include <math.h>
 
 #include <zm/zm_pi.h>
@@ -53,13 +53,17 @@ __EXPORT bool zIsSgnOpp(double a, double b);
  * of a given radian value \a angle. sin(\a angle) is
  * set for \a s, while cos(\a angle) for \a c.
  */
+#define _zSinCos(a,s,c) do{\
+  *(s) = sin(a);\
+  *(c) = cos(a);\
+} while(0)
 __EXPORT void zSinCos(double angle, double *s, double *c);
 
 /*! \brief normalize phase within the range from minus pi to pi.
  *
  * zPhaseNormalize() normalizes a radian value \a angle
- * within the range from minus pi to pi; suppose the result
- * value be \a x, \a x is \a angle + 2*pi*n, where n is
+ * within the range from minus pi to pi. It returns a value
+ * \a x that satisfies \a angle = \a x + 2*pi*n, where n is
  * an integer number which satisfies -pi<\a x<=pi.
  */
 __EXPORT double zPhaseNormalize(double angle);

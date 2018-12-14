@@ -7,7 +7,7 @@
 #ifndef __ZM_SEQ_H__
 #define __ZM_SEQ_H__
 
-#include <cure/cure.h>
+#include <zeda/zeda.h>
 #include <zm/zm_vec.h>
 
 __BEGIN_DECLS

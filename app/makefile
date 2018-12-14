@@ -11,13 +11,13 @@ BINDIR=$(PREFIX)/bin
 CC=gcc
 CFLAGS=-ansi -Wall -O3 $(INCLUDE) $(LIB)
 
-LINK=-lzm `cure-config -l`
+LINK=-lzm `zeda-config -l`
 
 COMPILE=$(CC) $(CFLAGS) -o $@ $< $(LINK)
 
 INSTALL=install -m 755
 
-CONFIGGEN=cure-config-gen
+CONFIGGEN=zeda-config-gen
 CONFIG=zm-config
 TARGET=$(CONFIG) deg2rad rad2deg le psolve pexp seqmod
 
@@ -33,9 +33,8 @@ $(CONFIG):
 	@echo " CC	" $<
 	@$(COMPILE)
 install: $(TARGET)
-	@echo " INSTALL" $^
+	@echo " INSTALL	" $^
 	@$(INSTALL) $^ $(BINDIR)
-
 clean:
 	@echo " CLEAN"
 	-@rm -f *.o *~ core $(TARGET)

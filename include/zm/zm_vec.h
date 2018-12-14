@@ -7,7 +7,7 @@
 #ifndef __ZM_VEC_H__
 #define __ZM_VEC_H__
 
-#include <cure/cure.h>
+#include <zeda/zeda.h>
 #include <zm/zm_complex.h>
 #include <zm/zm_raw.h>
 #include <zm/zm_stat.h>
@@ -242,7 +242,7 @@ __EXPORT bool zVecIsEqual(zVec v1, zVec v2);
  * the vector \a v are less than \a tol, or the false value
  * otherwise.
  * zVecIsTiny() is the same with zVecIsTol() except it compares
- * each component with zTOL(defined in cure_misc.h) instead of
+ * each component with zTOL(defined in zeda_misc.h) instead of
  * \a tol.
  * \return
  * zVecIsTol() and zVecIsTiny() return a boolean value.
@@ -262,72 +262,64 @@ __EXPORT bool zVecIsNan(zVec v);
  * zVecDemDRC, zVecCatDRC, zVecCats, zVecLS
  * - basic arithmetics for vector.
  *
- * 'zVecAddNC()' and 'zVecAdd()' add the two vectors,
+ * zVecAddNC() and zVecAdd() add the two vectors,
  * 'v1' and 'v2', and put the result into 'v'.
  *
- * 'zVecSubNC()' and 'zVecSub()' subtract 'v2' from
+ * zVecSubNC() and zVecSub() subtract 'v2' from
  * 'v1', and put the result into 'v'.
  *
- * 'zVecRevNC()' and 'zVecRev()' reverse 'v1', and put
+ * zVecRevNC() and zVecRev() reverse 'v1', and put
  * the result into 'v'.
  *
- * 'zVecMulNC()' and 'zVecMul()' multiply 'v1' by a
+ * zVecMulNC() and zVecMul() multiply 'v1' by a
  * scalar value 'k', and put the result into 'v'.
  *
- * 'zVecDivNC()' and 'zVecDiv()' divide 'v1' by 'k',
+ * zVecDivNC() and zVecDiv() divide 'v1' by 'k',
  * and put the result into 'v'.
  *
- * 'zVecAmpNC()' and 'zVecAmp()' amplify each component
+ * zVecAmpNC() and zVecAmp() amplify each component
  * of 'v1' by the corresponding component of a vector
  * 'amp', and put the result into 'v'.
  *
- * 'zVecDemNC()' and 'zVecDem()' demamgnify each component
+ * zVecDemNC() and zVecDem() demamgnify each component
  * of 'v1' by the corresponding component of a vector
  * 'dem', and put the result into 'v'.
  *
- * 'zVecCatNC()' and 'zVecCat()' concatenate 'v1' by
- * adding multiplied 'v2' by 'k', and put the result
- * into 'v'.
+ * zVecCatNC() and zVecCat() concatenate 'v1' by adding multiplied
+ * 'v2' by 'k', and put the result into 'v'.
  *
- * 'zVecAddNCDRC()' and 'zVecAddDRC()' directly add
- * 'v2' to 'v1'.
+ * zVecAddNCDRC() and zVecAddDRC() directly add 'v2' to 'v1'.
  *
- * 'zVecSubNCDRC()' and 'zVecSubDRC()' directly
- * subtract 'v2' from 'v1'.
+ * zVecSubNCDRC() and zVecSubDRC() directly subtract 'v2' from 'v1'.
  *
- * 'zVecRevNCDRC()' and 'zVecRevDRC()' directly reverse
- * 'v'.
+ * zVecRevNCDRC() and zVecRevDRC() directly reverse 'v'.
  *
- * 'zVecMulNCDRC()' and 'zVecMulDRC()' directly
- * multiply 'v' by 'k'.
+ * zVecMulNCDRC() and zVecMulDRC() directly multiply 'v' by 'k'.
  *
- * 'zVecDivNCDRC()' and 'zVecDivDRC()' directly divide
- * 'v' by 'k'.
+ * zVecDivNCDRC() and zVecDivDRC() directly divide 'v' by 'k'.
  *
- * 'zVecAmpNCDRC()' and 'zVecAmpDRC()' directly amplify
- * 'v' by 'amp'.
+ * zVecAmpNCDRC() and zVecAmpDRC() directly amplify 'v' by 'amp'.
  *
- * 'zVecDemNCDRC()' and 'zVecDemDRC()' directly demagnify
- * 'v' by 'dem'.
+ * zVecDemNCDRC() and zVecDemDRC() directly demagnify 'v' by 'dem'.
  *
- * 'zVecCatNCDRC()' and 'zVecCatDRC()' directly
- * concatenate 'v1' by adding multiplied 'v2' by 'k'.
+ * zVecCatNCDRC() and zVecCatDRC() directly concatenate 'v1' by
+ * adding multiplied 'v2' by 'k'.
  *
- * 'zVecCats()' concatenates 'n' vectors directly to
- * 'v'. Arguments follow 'n' as:
+ * zVecCats() concatenates 'n' vectors directly to 'v'.
+ * Arguments follow 'n' as:
  *   'k1', 'v1', 'k2', 'v2', ...
  * where 'kx's are scalar values and 'vx' are vectors.
  * Then, the resultant 'v' will be:
  *   'v' + 'k1'*'v1' + 'k2'*'v2' + ...
- * 'zVecLS()' computes linear sum of 'n' vectors.
+ * zVecLS() computes linear sum of 'n' vectors.
  * Arguments follow 'n' as:
  *   'k1', 'v1', 'k2', 'v2', ...
  * The resultant 'v' will be:
  *   'k1'*'v1' + 'k2'*'v2' + ...
- * [RETURN VALUE]
+ * \return
  * Each of all these functions returns a pointer to
  * the result.
- * [NOTES]
+ * \notes
  * The type of NC functions do not check the size
  * consistency. If it is not urgent and you are not
  * hasty, you should not use them.

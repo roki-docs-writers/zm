@@ -1,4 +1,4 @@
-include ../../config
+include ../config
 
 INCLUDE=`zm-config -I`
 LIB=`zm-config -L`
@@ -9,6 +9,6 @@ CFLAGS=-ansi -Wall -O3 $(LIB) $(INCLUDE) -funroll-loops -std=c99
 # -std=c99 is for gamma function test.
 
 %: %.c
-	$(CC) $(CFLAGS) -o $@ $< $(LINK)
+	@$(CC) $(CFLAGS) -o $@ $< $(LINK)
 clean :
 	-@rm -f *.o *~ core *test

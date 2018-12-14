@@ -1,6 +1,5 @@
 /* seqmod - sequence file modifier */
 
-#include <cure/cure_option.h>
 #include <zm/zm.h>
 
 zSeq seq;

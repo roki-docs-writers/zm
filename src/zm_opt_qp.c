@@ -166,18 +166,17 @@ zListClass( _zQPASMIndexList, _zQPASMIndex, _zQPASMIndexData );
 
 zVec _zQPSolveASMInitDefault(zMat a, zVec b, zVec ans, void *util)
 {
-	zVecClear( ans );
-	return ans;
+  return zVecClear( ans );
 }
 
 double _zQPSolveASMConditionDefault(zMat a, zVec ans, int i, void *util)
 {
-	return zRawVecInnerProd(zMatRowBuf(a,i),zVecBuf(ans),zVecSizeNC(ans));
+  return zRawVecInnerProd(zMatRowBuf(a,i),zVecBuf(ans),zVecSizeNC(ans));
 }
 
 int _zQPSolveASMInitIndex(zIndex idx, zMat a, zVec b, zVec ans, void *util, double cond(zMat,zVec,int,void*))
 {
-	int m, i;
+  int m, i;
 
   /* initialize the active set of constraints */
   for( m=0, i=0; i<zVecSizeNC(b); i++ ){
@@ -187,47 +186,51 @@ int _zQPSolveASMInitIndex(zIndex idx, zMat a, zVec b, zVec ans, void *util, doub
     } else
       zIndexElem(idx,i) = 0;
   }
-	return m;
+  return m;
 }
 
-void _zQPSolveASM(zMat q, zVec c, zMat a, zVec b, zVec ans, zIndex idx, void *util, double cond(zMat,zVec,int,void*))
+#define ZM_OPT_QP_ASM_TOL 1.0e-8
+bool _zQPSolveASM(zMat q, zVec c, zMat a, zVec b, zVec ans, zIndex idx, void *util, double cond(zMat,zVec,int,void*))
 {
-	zMat qa;
+  zMat qa;
   zVec xy, cb, d;
-	double tempd, tempd2, objv;
-	_zQPASMIndexList ilist;
+  double tempd, tempd2, objv;
+  _zQPASMIndexList ilist;
   _zQPASMIndex *idata;
-	bool endflag;
+  bool endflag, ret = true;
   int tempi;
-	int n, nm, m;
-	register int i, j, k;
+  int n, nm, m;
+  register int i, j, k;
 
   n = zVecSizeNC(ans);
-	zListInit( &ilist );
-	d = zVecAlloc(n);
-	qa = zMatAllocSqr( n + zVecSizeNC(b) );
-	xy = zVecAlloc( n + zVecSizeNC(b) );
-	cb = zVecAlloc( n + zVecSizeNC(b) );
-
-	if( cond == NULL ) cond = _zQPSolveASMConditionDefault;
-	m = _zQPSolveASMInitIndex( idx, a, b, ans, util, cond );
+  zListInit( &ilist );
+  d = zVecAlloc(n);
+  qa = zMatAllocSqr( n + zVecSizeNC(b) );
+  xy = zVecAlloc( n + zVecSizeNC(b) );
+  cb = zVecAlloc( n + zVecSizeNC(b) );
+  if( !d || !qa || !xy || !cb ){
+    ret = false;
+    goto RET;
+  }
+  if( cond == NULL ) cond = _zQPSolveASMConditionDefault;
+  m = _zQPSolveASMInitIndex( idx, a, b, ans, util, cond );
   do{
     nm = n + m;
-		zMatSetSize( qa, nm, nm );
-		zVecSetSize( xy, nm );
-		zVecSetSize( cb, nm );
+    zMatSetSize( qa, nm, nm );
+    zVecSetSize( xy, nm );
+    zVecSetSize( cb, nm );
 
     for( i=0; i<n; i++ )
       for( j=0; j<n; j++ )
         zMatElem(qa,i,j) = -zMatElem(q,i,j);
     for( k=0, j=n; j<nm; j++ ){
-      while( !zIndexElem(idx,k) && k<zVecSizeNC(b) ) k++;
+      while( !zIndexElem(idx,k) && k < zVecSizeNC(b) ) k++;
       for( i=0; i<n; i++ )
         zMatElem(qa,i,j) = zMatElem(a,k,i);
       k++;
     }
     for( k=0, i=n; i<nm; i++ ){
-      while( !zIndexElem(idx,k) && k<zVecSizeNC(b) ) k++;
+      while( !zIndexElem(idx,k) && k < zVecSizeNC(b) ) k++;
       for( j=0; j<n; j++ )
         zMatElem(qa,i,j) = zMatElem(a,k,j);
       k++;
@@ -238,12 +241,11 @@ void _zQPSolveASM(zMat q, zVec c, zMat a, zVec b, zVec ans, zIndex idx, void *ut
     for( i=0; i<n; i++ )
       zVecElem(cb,i) = zVecElem(c,i);
     for( k=0; i<nm; i++ ){
-      while( !zIndexElem(idx,k) && k<zVecSizeNC(b) ) k++;
+      while( !zIndexElem(idx,k) && k < zVecSizeNC(b) ) k++;
       zVecElem(cb,i) = zVecElem(b,k);
       k++;
     }
     zLESolveMP( qa, cb, NULL, NULL, xy );
-		/* zLESolveGauss( qa, cb, xy ); */
 
     for( i=0; i<n; i++ )
       if( !zIsTiny( zVecElem(xy,i) - zVecElem(ans,i) ) ) goto STEP2;
@@ -262,7 +264,7 @@ void _zQPSolveASM(zMat q, zVec c, zMat a, zVec b, zVec ans, zIndex idx, void *ut
     tempi = 0;
     for( i=0; i<zVecSizeNC(b); i++ )
       if( zIndexElem(idx,i) != 0 ){
-        if( fabs( zVecElem(xy,tempi+n) - tempd ) < 1.0e-8 ){
+        if( fabs( zVecElem(xy,tempi+n) - tempd ) < ZM_OPT_QP_ASM_TOL ){
           zIndexElem(idx,i) = 0;
           m--;
         }
@@ -276,14 +278,14 @@ void _zQPSolveASM(zMat q, zVec c, zMat a, zVec b, zVec ans, zIndex idx, void *ut
       zVecElem(d,i) = zVecElem(xy,i) - zVecElem(ans,i);
     tempd = 1.0;
     for( i=0; i<zVecSizeNC(b); i++ ){
-      tempd2 = zRawVecInnerProd(zMatRowBuf(a,i),zVecBuf(d),n);
+      tempd2 = zRawVecInnerProd( zMatRowBuf(a,i), zVecBuf(d), n );
       if( zIndexElem(idx,i) == 0 && tempd2 < 0 ){
         tempd2 = ( zVecElem(b,i) - cond( a, ans, i, util ) ) / tempd2;
         if( tempd2 < tempd ) tempd = tempd2;
       }
     }
     for( i=0; i<n; i++ )
-      zVecElem(ans,i) += tempd*zVecElem(d,i);
+      zVecElem(ans,i) += tempd * zVecElem(d,i);
     for( i=0; i<zVecSizeNC(b); i++ )
       if( zIndexElem(idx,i) == 0 && zIsTiny( cond( a, ans, i, util ) - zVecElem(b,i) ) ){
         zIndexElem(idx,i) = 1;
@@ -293,23 +295,21 @@ void _zQPSolveASM(zMat q, zVec c, zMat a, zVec b, zVec ans, zIndex idx, void *ut
     endflag = false;
     objv = zQuadraticValue( q, c, ans );
     zListForEach( &ilist, idata ){
-      for( i=0; i<zVecSizeNC(b);i++ ){
-        if( zIndexElem(idx,i) != zIndexElem(idata->data.idx,i) ) goto CONTINU;
-      }
-      if( fabs( idata->data.min - objv ) > 1.0e-8 ) goto CONTINU;
+      for( i=0; i<zVecSizeNC(b);i++ )
+        if( zIndexElem(idx,i) != zIndexElem(idata->data.idx,i) ) goto CONTINUE;
+      if( fabs( idata->data.min - objv ) > ZM_OPT_QP_ASM_TOL ) goto CONTINUE;
       endflag = true;
       break;
-     CONTINU:;
+     CONTINUE: ;
     }
     if( endflag == true ) goto RET;
 
     /* register to the list of bases */
     idata = zAlloc( _zQPASMIndex, 1 );
-    idata->data.idx = zIndexCreate(zVecSizeNC(b));
+    idata->data.idx = zIndexCreate( zVecSizeNC(b) );
     for( i=0; i<zVecSizeNC(b); i++ )
       zIndexElem(idata->data.idx,i) = zIndexElem(idx,i);
-    /* idata->data.min = zQuadraticValue( q, c, ans ); */
-		idata->data.min = objv;
+    idata->data.min = objv;
     zListInsertTail( &ilist ,idata );
   } while( 1 );
 
@@ -319,17 +319,20 @@ void _zQPSolveASM(zMat q, zVec c, zMat a, zVec b, zVec ans, zIndex idx, void *ut
   zListDestroy( _zQPASMIndex, &ilist );
   zMatFree( qa );
   zVecFreeAO( 3, xy, cb, d );
+  return ret;
 }
 
-void zQPSolveASM(zMat q, zVec c, zMat a, zVec b, zVec ans, double *cost, zVec init(zMat,zVec,zVec,void*), void *util)
+bool zQPSolveASM(zMat q, zVec c, zMat a, zVec b, zVec ans, double *cost, zVec init(zMat,zVec,zVec,void*), void *util)
 {
   zIndex idx;
+  bool ret;
 
   if( !init ) init = _zQPSolveASMInitDefault;
-	init( a, b, ans, util );
+  init( a, b, ans, util );
   idx = zIndexCreate( zVecSizeNC(b) );
-	_zQPSolveASM( q, c, a, b, ans, idx, util, _zQPSolveASMConditionDefault );;
+  ret = _zQPSolveASM( q, c, a, b, ans, idx, util, _zQPSolveASMConditionDefault );
   zIndexFree( idx );
+  return ret;
 }
 
 /* zCGSolve

@@ -1,6 +1,13 @@
-2018. 7. 9. Updated zQPSolveASM. [zm_opt_qp] (by Naoki Wakisaka)
-2018. 7. 9. Debugged zLPSolvePDIP_PC. [zm_opt_lp_pdip] (by Naoki Wakisaka)
-2018. 7. 9. Debugged _zLPTableauReset and _zLPTableauSimplex. [zm_opt_lp_simplex] (by Naoki Wakisaka)
+2018.12.12. Followed renaming of CURE to ZEDA. [all]
+2018.10.19. Added _zSinCos. [zm_misc]
+2018.10.18. Created automatic testing system. [test]
+2018. 7. 9. Updated zQPSolveASM. (by Naoki Wakisaka) [zm_opt_qp]
+2018. 7. 9. Debugged zLPSolvePDIP_PC. (by Naoki Wakisaka) [zm_opt_lp_pdip]
+2018. 7. 9. Debugged _zLPTableauReset and _zLPTableauSimplex. (by Naoki Wakisaka) [zm_opt_lp_simplex]
+2016. 2.24. Debugged zLPFeasibleBase thanks to Naoki Wakisaka. [zm_opt_lp_simplex]
+2015.12. 8. Added zChi2Distrib and zChi2CumDistrib. [zm_stat]
+2015.12. 8. Debugged zNormalCumDistrib. [zm_stat]
+2015.10.21. Debugged zVecSort and _zVecSortCmp. [zm_vec]
 2015. 7.10. Debugged zQPSolveASM thanks to Naoki Wakisaka. [zm_opt_qp]
 2015. 7. 1. Modified zNURBSVecNN. [zm_nurbs]
 2015. 5. 6. Modified _zNURBSBasisDiff and zNURBSVecDiff. [zm_nurbs]

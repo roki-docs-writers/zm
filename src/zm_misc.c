@@ -19,8 +19,7 @@ bool zIsSgnOpp(double a, double b)
  */
 void zSinCos(double angle, double *s, double *c)
 {
-  *s = sin(angle);
-  *c = cos(angle);
+  _zSinCos( angle, s, c );
 }
 
 /* zPhaseNormalize
@@ -30,7 +29,7 @@ double zPhaseNormalize(double angle)
 {
   double s, c;
 
-  zSinCos( angle, &s, &c );
+  _zSinCos( angle, &s, &c );
   return atan2( s, c );
 }
 

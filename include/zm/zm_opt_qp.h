@@ -62,7 +62,7 @@ __EXPORT bool zQPSolveIP(zMat q, zVec c, zMat a, zVec b, zVec ans, double *cost)
  * constraint to find the vector x which minimizes 0.5 xT q x + cT x
  * subject to a x >= b and x >= 0 based on active-set method.
  */
-__EXPORT void zQPSolveASM(zMat q, zVec c, zMat a, zVec b, zVec ans, double *cost, zVec init(zMat,zVec,zVec,void*), void *util);
+__EXPORT bool zQPSolveASM(zMat q, zVec c, zMat a, zVec b, zVec ans, double *cost, zVec init(zMat,zVec,zVec,void*), void *util);
 
 /*! \brief quadratic programming solver by conjugate gradient method.
  *

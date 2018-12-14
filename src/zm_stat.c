@@ -62,19 +62,24 @@ double *zCombiSeries(int n, size_t size, double c[])
  */
 double zNormalDistrib(double x, double mu, double sigma)
 {
-  double z;
-
-  z = ( x - mu ) / sigma;
-  return zND / sigma * exp( -0.5 * zSqr(z) );
+  return zND / sigma * exp( -0.5 * zSqr( ( x - mu ) / sigma ) );
 }
 
 /* zNormalCumDistrib
  * - normal cumulative distribution.
- *   requires Gauss's error function (erf).
  */
+#define Z_ND_CUM_MAX 200
 double zNormalCumDistrib(double x, double mu, double sigma)
 {
-  return 0.5 * ( 1 + zErf( ( x - mu ) / ( sqrt(2) * sigma ) ) );
+  register int i;
+  double x2, p, pp, t;
+
+  x -= mu;
+  x2 = zSqr( x / sigma );
+  t = p = pp = x * exp(-0.5*x2) / ( sqrt(zPIx2) * sigma );
+  for( i=3; i<Z_ND_CUM_MAX; pp=p, i+=2 )
+    if( ( p += ( t *= x2 / i ) ) == pp ) return 0.5 + p;
+  return x > 0 ? 1.0 : 0.0;
 }
 
 /* zPoissonDistrib
@@ -91,6 +96,39 @@ double zPoissonDistrib(int x, double lambda)
 double zBinDistrib(int x, int n, double p)
 {
   return zCombi( n, x ) * pow( p, x ) * pow( 1-p, n-x );
+}
+
+/* zChi2Distrib
+ * - chi-squared distribution.
+ */
+double zChi2Distrib(double x, int k)
+{
+  double kd;
+
+  kd = 0.5 * k;
+  return pow(0.5,kd)*pow(x,kd-1)*exp(-0.5*x)/zGamma(kd);
+}
+
+/* zChi2CumDistrib
+ * - chi-squared cumulative distribution.
+ */
+double zChi2CumDistrib(double x, int k)
+{
+  register int i;
+  double s, t, chi;
+
+  if( k == 1 )
+    return 2 * zNormalCumDistrib(sqrt(x),0,1) - 1;
+  if( k % 2 == 1 ){
+    s = t = ( chi = sqrt(x) ) * exp(-0.5*x) / sqrt(zPIx2);
+    for( i=3; i<k; i+=2 )
+      s += ( t *= x / i );
+    return 2 * zNormalCumDistrib(chi,0,1) - 1 - 2 * s;
+  }
+  s = t = exp(-0.5*x);
+  for( i=2; i<k; i+=2 )
+    s += ( t *= x / i );
+  return 1 - s;
 }
 
 /* basic statistics computation */
