@@ -1,3 +1,5 @@
+2015. 5. 6. Added zNURBSCPNum. [zm_nurbs]
+2015. 5. 6. Removed seq member from zNURBS. [zm_nurbs]
 2015. 5. 4. Reflected modification of zOptionRead. [app]
 2015. 5. 3. Debugged _zNURBSSeg. [zm_nurbs]
 2015. 5. 1. Modified zNURBSCreate to read a sequence of control points from head to tail. [zm_nurbs]

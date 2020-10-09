@@ -19,6 +19,7 @@ bool zNURBSCreate(zNURBS *nurbs, zSeq *seq, int dim)
 {
   register int i, j;
   zSeqListCell *cp;
+  bool ret = true;
 
   if( zListNum(seq) <= dim ){
     ZRUNERROR( ZM_ERR_NURBS_INVDIM );
@@ -28,26 +29,28 @@ bool zNURBSCreate(zNURBS *nurbs, zSeq *seq, int dim)
   nurbs->knot = zVecAlloc( zListNum(seq)+dim+1 );
 
   zArrayAlloc( &nurbs->cparray, zNURBSCPCell, zListNum(seq) );
-  if( !nurbs->knot || zArrayNum(&nurbs->cparray) == 0 ){
+  if( !nurbs->knot || zNURBSCPNum(nurbs) == 0 ){
     ZALLOCERROR();
     zNURBSDestroy( nurbs );
     return false;
   }
-  nurbs->seq = seq;
   /* set knots & assign control points & initialize weight uniformly */
   for( j=0; j<dim; j++ )
     zNURBSKnot(nurbs,j) = 0;
   i = 0;
   zListForEachRew( seq, cp ){
     zNURBSWeight(nurbs,i) = 1.0;
-    zNURBSCP(nurbs,i) = cp->data.v;
+    if( !( zNURBSCP(nurbs,i) = zVecClone( cp->data.v ) ) )
+      ret = false;
     zNURBSKnot(nurbs,j) = zNURBSKnot(nurbs,j-1) + cp->data.dt;
     j++;
     i++;
   }
   for( ; j<zVecSizeNC(nurbs->knot); j++ )
     zNURBSKnot(nurbs,j) = zNURBSKnot(nurbs,j-1);
-  return true;
+  if( !ret )
+    zNURBSDestroy( nurbs );
+  return ret;
 }
 
 /* zNURBSDestroy
@@ -55,10 +58,13 @@ bool zNURBSCreate(zNURBS *nurbs, zSeq *seq, int dim)
  */
 void zNURBSDestroy(zNURBS *nurbs)
 {
-  nurbs->seq = NULL;
+  register int i;
+
   nurbs->dim = 0;
   zVecFree( nurbs->knot );
   nurbs->knot = NULL;
+  for( i=0; i<zNURBSCPNum(nurbs); i++ )
+    zVecFree( zNURBSCP(nurbs,i) );
   zArrayFree( &nurbs->cparray );
 }
 
@@ -132,8 +138,8 @@ zVec zNURBSVec(zNURBS *nurbs, double t, zVec v)
   if( s == -1 )
     return zVecCopy( zNURBSCP(nurbs,0), v );
   if( s == -2 )
-    return zVecCopy( zNURBSCP(nurbs,zArrayNum(&nurbs->cparray)-1), v );
-  e = zMin( s+1, zArrayNum(&nurbs->cparray) );
+    return zVecCopy( zNURBSCP(nurbs,zNURBSCPNum(nurbs)-1), v );
+  e = zMin( s+1, zNURBSCPNum(nurbs) );
   for( i=zMax(s-nurbs->dim,0); i<e; i++ ){
     b = zNURBSWeight(nurbs,i) * _zNURBSBasis(nurbs,t,i,nurbs->dim+1,s);
     den += b;
@@ -211,7 +217,7 @@ zVec zNURBSVecDiff(zNURBS *nurbs, double t, zVec v, int diff)
     t_tmp = zNURBSKnot0(nurbs);
   else if( s == -2 )
     t_tmp = zNURBSKnotE(nurbs);
-  e = zMin( s+1, zArrayNum(&nurbs->cparray) );
+  e = zMin( s+1, zNURBSCPNum(nurbs) );
   for( i=zMax(s-nurbs->dim,0); i<e; i++ ){
     b = zNURBSWeight(nurbs,i) * _zNURBSBasisDiff(nurbs,t_tmp,i,nurbs->dim+1,s,diff);
     zVecCatNCDRC( v, b, zNURBSCP(nurbs,i) );
@@ -268,7 +274,7 @@ void zNURBSCPArrayFWrite(FILE *fp, zNURBS *nurbs)
 {
   register int i;
 
-  for( i=0; i<zArrayNum(&nurbs->cparray); i++ ){
+  for( i=0; i<zNURBSCPNum(nurbs); i++ ){
     fprintf( fp, "[%03d] (%g) ", i, zNURBSWeight(nurbs,i) );
     zVecFWrite( fp, zNURBSCP(nurbs,i) );
   }

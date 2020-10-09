@@ -13,7 +13,7 @@ void test_weight(zNURBS *nurbs, int w)
   sprintf( filename, "w%d", w );
   fp = fopen( filename, "w" );
   zNURBSWeight(nurbs,4) = (double)w;
-  v = zVecAlloc( zVecSizeNC(zListHead(nurbs->seq)->data.v) );
+  v = zVecAlloc( zVecSizeNC( zNURBSCP(nurbs,0) ) );
   for( i=0; i<=STEP; i++ ){
     t = ( zNURBSKnotE(nurbs)-zNURBSKnot0(nurbs) ) * i / STEP + zNURBSKnot0(nurbs);
     if( zNURBSVec( nurbs, t, v ) )

@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
     zSeqEnqueue( &seq, v, 1.0 /* dummy */ );
   }
   zNURBSCreate( &nurbs, &seq, 2 );
+  zSeqFree( &seq );
 
   zNURBSKnot(&nurbs,0) = 0.0;
   zNURBSKnot(&nurbs,1) = 0.0;
@@ -54,6 +55,5 @@ int main(int argc, char *argv[])
   }
   zVecFree( v );
   zNURBSDestroy( &nurbs );
-  zSeqFree( &seq );
   return 0;  
 }

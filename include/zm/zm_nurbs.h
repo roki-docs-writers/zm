@@ -41,7 +41,6 @@ zArrayClass( zNURBSCPArray, zNURBSCPCell );
  *//* ******************************************************* */
 typedef struct{
   int dim;   /*!< \brief dimension of a curve */
-  zSeq *seq; /*!< \brief a sequence of control points */
   /*! \cond */
   zVec knot;             /* knot vector */
   zNURBSCPArray cparray; /* an array of control points */
@@ -54,6 +53,8 @@ typedef struct{
 
 #define zNURBSKnot0(n)     zNURBSKnot(n,0)
 #define zNURBSKnotE(n)     zNURBSKnot(n,zVecSizeNC((n)->knot)-1)
+
+#define zNURBSCPNum(n)     zArrayNum( &(n)->cparray )
 
 /*! \brief create a NURBS curve.
  *

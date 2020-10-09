@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
     zSeqEnqueue( &seq, v, 1.0 );
   }
   zNURBSCreate( &nurbs, &seq, DIM );
+  zSeqFree( &seq );
 
   for( i=0; i<num ; i++ )
     zNURBSWeight(&nurbs, i) = weight[i];
@@ -49,6 +50,5 @@ int main(int argc, char *argv[])
   }
   zVecFree( v );
   zNURBSDestroy( &nurbs );
-  zSeqFree( &seq );
   return 0;
 }

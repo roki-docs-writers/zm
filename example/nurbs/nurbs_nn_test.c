@@ -9,8 +9,8 @@ void test(zNURBS *nurbs)
   FILE *fp;
   zVec v, nn;
 
-  v = zVecAlloc( zVecSizeNC(zListHead(nurbs->seq)->data.v) );
-  nn = zVecAlloc( zVecSizeNC(zListHead(nurbs->seq)->data.v) );
+  v = zVecAlloc( zVecSizeNC( zNURBSCP(nurbs,0) ) );
+  nn = zVecAlloc( zVecSizeNC( zNURBSCP(nurbs,0) ) );
 
   fp = fopen( "p", "w" );
   for( i=0; i<=STEP; i++ ){
