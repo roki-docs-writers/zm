@@ -257,6 +257,7 @@ bool zLPSolvePDIP_PC(zMat a, zVec b, zVec c, zVec x, double *cost)
   _zLP_PDIP_PC pc;
   double e, ap, ad;
   bool ret = false;
+	int cnt = 0;
 
   if( !_zLP_PDIPAlloc( &dat, a, b, c, x ) ) goto TERMINATE2;
   if( !_zLP_PDIP_PCAlloc( &pc, b, c ) ) goto TERMINATE1;
@@ -282,6 +283,8 @@ bool zLPSolvePDIP_PC(zMat a, zVec b, zVec c, zVec x, double *cost)
     zVecCatNCDRC( dat.x, ap, pc.dx );
     zVecCatNCDRC( dat.y, ad, pc.dy );
     zVecCatNCDRC( dat.z, ad, pc.dz );
+		cnt++;
+		if( cnt == 10000 ) break;
   }
   zVecTouchup( x );
   ret = true;

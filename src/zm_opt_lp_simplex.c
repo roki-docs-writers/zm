@@ -29,7 +29,6 @@ static bool _zLPTableauReset(_zLPTableau *tab, zVec c);
 static void _zLPTableauAns(_zLPTableau *tab, zVec ans);
 #ifdef DEBUG
 static void _zLPTableauWrite(_zLPTableau *tab);
-static void _zLPTableauFWrite(FILE *fp, _zLPTableau *tab);
 #endif /* DEBUG */
 
 /* (static)
@@ -222,9 +221,12 @@ void _zLPTableauSwapPivot(_zLPTableau *tab, int np, int na)
 bool _zLPTableauSimplex(_zLPTableau *tab)
 {
   int na, np;
+	int cnt = 0;
 
   _zLPTableauSweepC( tab );
   while( ( na = _zLPTableauFindNA( tab ) ) >= 0 ){
+		/* endless loop happens rarely */
+		if( cnt++ > 1000 ) return false;
     if( ( np = _zLPTableauFindNP( tab, &na ) ) < 0 )
       return false;
     _zLPTableauSweepA( tab, np, na );
@@ -249,7 +251,7 @@ bool _zLPTableauReset(_zLPTableau *tab, zVec c)
     if( zIndexElem(tab->ib,i) < n ) continue;
     for( j=0; j<zArrayNum(tab->in); j++ )
       /* if( j < n && zVecElem(tab->c,zIndexElem(tab->in,j)) > zTOL ){ */
-      if( zIndexElem(tab->in,j) < n && zVecElem(tab->c,zIndexElem(tab->in,j)) > zTOL ){
+			if( zIndexElem(tab->in,j) < n && zVecElem(tab->c,zIndexElem(tab->in,j)) > zTOL ){
         _zLPTableauSwapPivot( tab, i, j );
         goto NEXT;
       }
@@ -298,16 +300,6 @@ void _zLPTableauWrite(_zLPTableau *tab)
   printf( "(Ib): " ); zIndexWrite( tab->ib );
   printf( "(In): " ); zIndexWrite( tab->in );
 }
-
-void _zLPTableauFWrite(FILE *fp, _zLPTableau *tab)
-{ /* for debug. */
-  fprintf( fp, "A: " ); zMatFWrite( fp, tab->a );
-  fprintf( fp, "b: " ); zVecFWrite( fp, tab->b );
-  fprintf( fp, "c: " ); zVecFWrite( fp, tab->c );
-  fprintf( fp, "d: = %f\n", tab->d );
-  fprintf( fp, "(Ib): " ); zIndexFWrite( fp, tab->ib );
-  fprintf( fp, "(In): " ); zIndexFWrite( fp, tab->in );
-}
 #endif /* DEBUG */
 
 /* zLPSolveSimplex
@@ -331,8 +323,7 @@ bool zLPSolveSimplex(zMat a, zVec b, zVec c, zVec ans, double *cost)
     return false;
   }
   /* first phase: feasible base */
-  /* if( !_zLPTableauSimplex( &tab ) || !zIsTiny(tab.d) ){ */
-  if( !_zLPTableauSimplex( &tab ) || tab.d > zTOL ){
+  if( !_zLPTableauSimplex( &tab ) || !zIsTiny(tab.d) ){
     ZRUNWARN( ZM_ERR_OPT_UNSOLVE );
     goto TERMINATE;
   }
@@ -369,8 +360,8 @@ bool zLPFeasibleBase(zMat a, zVec b, zVec base)
   }
   if( !_zLPTableauSimplex( &tab ) || !zIsTiny(tab.d) ){
     ZRUNWARN( ZM_ERR_OPT_UNSOLVE );
-  } else {
-    /* _zLPTableauAns( &tab, base ); */
+  } else{
+    _zLPTableauAns( &tab, base );
     ret = true;
   }
   _zLPTableauDestroy( &tab );

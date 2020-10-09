@@ -161,7 +161,7 @@ void zRawVecCat(double *v1, double k, double *v2, double *v, int size)
  */
 void zRawVecAddDRC(double *v1, double *v2, int size)
 {
-  while( size-- > 0 ) *v1++ = *v2++;
+  while( size-- > 0 ) *v1++ += *v2++;
 }
 
 /* zRawVecSubDRC
