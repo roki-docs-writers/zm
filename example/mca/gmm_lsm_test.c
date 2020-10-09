@@ -5,10 +5,10 @@ zVec errorLSM(zVec p, zVec mean, void *dummy, zVec err)
 {
   double xm, e;
 
-  xm = zVecElem(p,_zVecSize(p)-1);
-  zVecElem(p,_zVecSize(p)-1) = 1;
+  xm = zVecElem(p,zVecSizeNC(p)-1);
+  zVecElem(p,zVecSizeNC(p)-1) = 1;
   e = zVecInnerProd(mean,p) - xm;
-  zVecElem(p,_zVecSize(p)-1) = xm;
+  zVecElem(p,zVecSizeNC(p)-1) = xm;
   zVecElem(err,0) = e;
   return err;
 }
@@ -20,19 +20,19 @@ zVec meanLSM(zVecList *pl, void *dummy, zVec mean)
   zVec b;
   double xm;
 
-  c = zMatAllocSqr( _zVecSize(zListTail(pl)->data) );
-  b = zVecAlloc( _zVecSize(zListTail(pl)->data) );
+  c = zMatAllocSqr( zVecSizeNC(zListTail(pl)->data) );
+  b = zVecAlloc( zVecSizeNC(zListTail(pl)->data) );
   if( c == NULL || b == NULL ){
     ZALLOCERROR();
     mean = NULL;
     goto TERMINATE;
   }
   zListForEach( pl, vc ){
-    xm = zVecElem(vc->data,_zVecSize(vc->data)-1);
-    zVecElem(vc->data,_zVecSize(vc->data)-1) = 1;
+    xm = zVecElem(vc->data,zVecSizeNC(vc->data)-1);
+    zVecElem(vc->data,zVecSizeNC(vc->data)-1) = 1;
     zMatAddDyadNC( c, vc->data, vc->data );
     zVecCatNCDRC( b, xm, vc->data );
-    zVecElem(vc->data,_zVecSize(vc->data)-1) = xm;
+    zVecElem(vc->data,zVecSizeNC(vc->data)-1) = xm;
   }
   zLESolveGauss( c, b, mean );
  TERMINATE:
@@ -49,21 +49,21 @@ zVec meanlLSM(zVecList *pl, double load[], double n, void *dummy, zVec mean)
   double xm;
   register int i = 0;
 
-  c = zMatAllocSqr( _zVecSize(zListTail(pl)->data) );
-  b = zVecAlloc( _zVecSize(zListTail(pl)->data) );
-  g = zVecAlloc( _zVecSize(zListTail(pl)->data) );
+  c = zMatAllocSqr( zVecSizeNC(zListTail(pl)->data) );
+  b = zVecAlloc( zVecSizeNC(zListTail(pl)->data) );
+  g = zVecAlloc( zVecSizeNC(zListTail(pl)->data) );
   if( c == NULL || b == NULL || g == NULL ){
     ZALLOCERROR();
     mean = NULL;
     goto TERMINATE;
   }
   zListForEach( pl, vc ){
-    xm = zVecElem(vc->data,_zVecSize(vc->data)-1);
-    zVecElem(vc->data,_zVecSize(vc->data)-1) = 1;
+    xm = zVecElem(vc->data,zVecSizeNC(vc->data)-1);
+    zVecElem(vc->data,zVecSizeNC(vc->data)-1) = 1;
     zVecMulNC( vc->data, load[i], g );
     zMatAddDyadNC( c, g, vc->data );
     zVecCatNCDRC( b, load[i]*xm, vc->data );
-    zVecElem(vc->data,_zVecSize(vc->data)-1) = xm;
+    zVecElem(vc->data,zVecSizeNC(vc->data)-1) = xm;
     i++;
   }
   zLESolveGauss( c, b, mean );

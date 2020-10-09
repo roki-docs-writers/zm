@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
   zListInit( &seq );
   for( i=0; i<num; i++ ){
     v = zVecCreateList( 2, xp[i], yp[i] );
-    zSeqEnqueue( &seq, v, 1.0 );
+    zSeqEnqueue( &seq, v, 1.0 /* dummy */ );
   }
   zNURBSCreate( &nurbs, &seq, 2 );
 

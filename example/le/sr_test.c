@@ -9,8 +9,8 @@ zVec zLESolveSRCG(zMat a, zVec b, zVec wn, zVec we, zVec ans)
   zVec v;
 
   m1 = zMatAlloc( _zMatColSize(a), _zMatRowSize(a) );
-  m2 = zMatAllocSqr( _zVecSize(ans) );
-  v = zVecAlloc( _zVecSize(ans) );
+  m2 = zMatAllocSqr( zVecSizeNC(ans) );
+  v = zVecAlloc( zVecSizeNC(ans) );
   for( i=0; i<_zMatRowSize(a); i++ )
     for( j=0; j<_zMatColSize(a); j++ )
       zMatSetElem( m1, j, i, zMatElem(a,i,j)*zVecElem(we,i) );

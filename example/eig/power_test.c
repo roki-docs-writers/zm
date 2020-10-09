@@ -5,7 +5,7 @@ void check(zMat m, zVec v, double s)
   zVec e;
 
   eprintf( "%.16g\n", s );
-  e = zVecAlloc( _zVecSize(v) );
+  e = zVecAlloc( zVecSizeNC(v) );
   zMulMatVec( m, v, e );
   zVecCatNCDRC( e, -s, v );
   eprintf( " %g ... %s.\n", zVecAbsMax(e,NULL), zVecIsTiny(e) ? "OK" : "maybe a bug" );

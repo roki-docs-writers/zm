@@ -13,7 +13,7 @@ bool zPexIPCreateBounderyLSM(zPexIP *pc, double term, double x1, double v1, doub
     return false;
   }
 
-  n = _zVecSize( t );
+  n = zVecSizeNC( t );
   if( !zPexIPCreate( pc, term, dim ) ) return false;
   m = dim + 1;
   a = zMatCreateSqr( m );
@@ -25,7 +25,7 @@ bool zPexIPCreateBounderyLSM(zPexIP *pc, double term, double x1, double v1, doub
   }
 
   for( i=0; i<n; i++ ){
-    for( j=0; j<_zVecSize(v); j++ )
+    for( j=0; j<zVecSizeNC(v); j++ )
       zVecSetElem( v, j, pow( zVecElem(t,i)/term, j ) );
     for( j=3; j<m-3; j++ ){
       for( k=0; k<m; k++ )

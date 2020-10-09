@@ -10,7 +10,7 @@ double eval(zVec var, void *dummy)
   int i;
   double x, y, val;
 
-  for( val=0, i=0; i<_zVecSize(var); i+=2 ){
+  for( val=0, i=0; i<zVecSizeNC(var); i+=2 ){
     x = zVecElem(var,i  );
     y = zVecElem(var,i+1);
     val += 100 * zSqr( y - x*x ) + zSqr( 1 - x );
@@ -22,7 +22,7 @@ zVec grad(zVec var, zVec g, void *dummy)
   int i;
   double x, y;
 
-  for( i=0; i<_zVecSize(var); i+=2 ){
+  for( i=0; i<zVecSizeNC(var); i+=2 ){
     x = zVecElem(var,i  );
     y = zVecElem(var,i+1);
     zVecSetElem( g, i  ,-400*x*(y-x*x)+2*(x-1) );
@@ -35,7 +35,7 @@ zMat hess(zVec var, zMat h, void *dummy)
   int i;
   double x, y;
 
-  for( i=0; i<_zVecSize(var); i+=2 ){
+  for( i=0; i<zVecSizeNC(var); i+=2 ){
     x = zVecElem(var,i  );
     y = zVecElem(var,i+1);
     zMatSetElem( h, i  , i  ,-400*y+1200*x*x+2 );
@@ -54,7 +54,7 @@ double eval(zVec var, void *dummy)
   int i;
   double x, y, val;
 
-  for( val=0, i=0; i<_zVecSize(var); i+=2 ){
+  for( val=0, i=0; i<zVecSizeNC(var); i+=2 ){
     x = zVecElem(var,i  );
     y = zVecElem(var,i+1);
     val += zSqr( BF_C1 - x*(1-y) ) + zSqr( BF_C2 - x*(1-y*y) ) + zSqr( BF_C3 - x*(1-y*y*y) );
@@ -67,7 +67,7 @@ zVec grad(zVec var, zVec g, void *dummy)
   double x, y;
   double c1, c2, c3;
 
-  for( i=0; i<_zVecSize(var); i+=2 ){
+  for( i=0; i<zVecSizeNC(var); i+=2 ){
     x = zVecElem(var,i  );
     y = zVecElem(var,i+1);
     c1 = 2 * ( BF_C1 - x*(1-y) );
@@ -113,7 +113,7 @@ double eval(zVec var, void *dummy)
   register int i;
   double val;
 
-  for( val=0, i=0; i<_zVecSize(var); i++ )
+  for( val=0, i=0; i<zVecSizeNC(var); i++ )
     val += zSqr( exp(zVecElem(var,i)+0.01*i)-1 );
   return 0.5 * val;
 }
@@ -122,7 +122,7 @@ zVec grad(zVec var, zVec g, void *dummy)
   register int i;
   double e;
 
-  for( i=0; i<_zVecSize(var); i++ ){
+  for( i=0; i<zVecSizeNC(var); i++ ){
     e = exp( zVecElem(var,i)+0.01*i );
     zVecSetElem( g, i, (e-1)*e );
   }
@@ -134,7 +134,7 @@ double eval(zVec var, void *dummy)
   register int i;
   double val;
 
-  for( val=0, i=0; i<_zVecSize(var); i++ )
+  for( val=0, i=0; i<zVecSizeNC(var); i++ )
     val += zSqr( log(zVecElem(var,i)-i) );
   return 0.5 * val;
 }
@@ -142,7 +142,7 @@ zVec grad(zVec var, zVec g, void *dummy)
 {
   register int i;
 
-  for( i=0; i<_zVecSize(var); i++ )
+  for( i=0; i<zVecSizeNC(var); i++ )
     zVecSetElem( g, i, 2*log(zVecElem(var,i)-i)/fabs(zVecElem(var,i)-i) );
   return g;
 }
@@ -152,7 +152,7 @@ double eval(zVec var, void *dummy)
   register int i;
   double x, y, val;
 
-  for( val=0, i=0; i<_zVecSize(var); i+=2 ){
+  for( val=0, i=0; i<zVecSizeNC(var); i+=2 ){
     x = zVecElem(var,i);
     y = zVecElem(var,i+1);
     val += pow(x-2,6) + zSqr(x-2)*y*y+pow(y+1,4);
@@ -164,7 +164,7 @@ zVec grad(zVec var, zVec g, void *dummy)
   register int i;
   double x, y, val;
 
-  for( val=0, i=0; i<_zVecSize(var); i+=2 ){
+  for( val=0, i=0; i<zVecSizeNC(var); i+=2 ){
     x = zVecElem(var,i);
     y = zVecElem(var,i+1);
     zVecSetElem( g, i,   6*pow(x-2,5)+2*(x-2)*y*y );
@@ -178,7 +178,7 @@ double eval(zVec var, void *dummy)
   register int i;
   double x, y, val;
 
-  for( val=0, i=0; i<_zVecSize(var); i+=2 ){
+  for( val=0, i=0; i<zVecSizeNC(var); i+=2 ){
     x = zVecElem(var,i);
     y = zVecElem(var,i+1);
     val += cos(x*x-3*y) + sin(x*x+y*y);
@@ -190,7 +190,7 @@ zVec grad(zVec var, zVec g, void *dummy)
   register int i;
   double x, y, val;
 
-  for( val=0, i=0; i<_zVecSize(var); i+=2 ){
+  for( val=0, i=0; i<zVecSizeNC(var); i+=2 ){
     x = zVecElem(var,i);
     y = zVecElem(var,i+1);
     zVecSetElem( g, i,   6*pow(x-2,5)+2*(x-2)*y*y );
@@ -204,7 +204,7 @@ double eval(zVec var, void *dummy)
   register int i;
   double val;
 
-  for( val=0, i=0; i<_zVecSize(var); i++ )
+  for( val=0, i=0; i<zVecSizeNC(var); i++ )
     val += (i+1)*zSqr( zVecElem(var,i)-i );
   return 0.5*val;
 }
@@ -212,7 +212,7 @@ zVec grad(zVec var, zVec g, void *dummy)
 {
   register int i;
 
-  for( i=0; i<_zVecSize(var); i++ )
+  for( i=0; i<zVecSizeNC(var); i++ )
     zVecSetElem( g, i, (i+1)*(zVecElem(var,i)-i) );
   return g;
 }

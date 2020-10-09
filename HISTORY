@@ -1,3 +1,8 @@
+2015. 5. 1. Modified zNURBSCreate to read a sequence of control points from head to tail. [zm_nurbs]
+2015. 4.27. Modified zClusterDataFWrite. [zm_mca_cluster]
+2015. 4.24. Added zNURBSVecNN. [zm_nurbs]
+2015. 4.24. Debugged _zNURBSSeg. [zm_nurbs]
+2015. 4.22. Modified zNURBSCreate so as to align the knot vector with delta times provided by a sequence of control points. [zm_nurbs]
 2015. 4.11. Reflected the modification of zOptionRead. [app]
 2015. 3.31. Renamed _zVecSize, _zMatRowSize and _zMatColSize to zVecSizeNC, zMatRowSizeNC and zMatColSizeNC, respectively. [all]
 2015. 3.25. Renamed Z_ZEROCOMPLEX to ZCOMPLEXZERO. [zm_complex, zm_cvec, zm_cmat]

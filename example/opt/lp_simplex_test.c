@@ -155,7 +155,7 @@ int main(void)
   printf( "cost=%f\n", cost );
   printf( "<true answer>\n" );
   zVecWrite( &ans );
-  printf( "cost=%f\n", zRawVecInnerProd( answer, zVecBuf(c), _zVecSize(&ans) ) );
+  printf( "cost=%f\n", zRawVecInnerProd( answer, zVecBuf(c), zVecSizeNC(&ans) ) );
 
   zMatFree( a );
   zVecFree( b );

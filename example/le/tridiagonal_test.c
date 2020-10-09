@@ -7,10 +7,10 @@ void check(zVec a, zVec b, zVec c, zVec d, zVec ans)
   register int i;
   double err;
 
-  for( i=0; i<_zVecSize(ans); i++ ){
+  for( i=0; i<zVecSizeNC(ans); i++ ){
     err = zVecElem(b,i)*zVecElem(ans,i);
     if( i > 0 ) err += zVecElem(a,i)*zVecElem(ans,i-1);
-    if( i < _zVecSize(a)-1 ) err += zVecElem(c,i)*zVecElem(ans,i+1);
+    if( i < zVecSizeNC(a)-1 ) err += zVecElem(c,i)*zVecElem(ans,i+1);
     err -= zVecElem(d,i);
     eprintf( "%d:err=%g\n", i, err );
     if( !zIsTiny(err) )

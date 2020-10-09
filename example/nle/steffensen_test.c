@@ -7,10 +7,10 @@ zVec zSSSolveSteffensen(zVec (* f)(zVec,zVec,void*), zVec x, void *util, int ite
   zVec f0, f1;
   double l;
 
-  dx = zMatAllocSqr( _zVecSize(x) );
-  ddx = zMatAllocSqr( _zVecSize(x) );
-  f0 = zVecAlloc( _zVecSize(x) );
-  f1 = zVecAlloc( _zVecSize(x) );
+  dx = zMatAllocSqr( zVecSizeNC(x) );
+  ddx = zMatAllocSqr( zVecSizeNC(x) );
+  f0 = zVecAlloc( zVecSizeNC(x) );
+  f1 = zVecAlloc( zVecSizeNC(x) );
 
   ZITERINIT( iter );
   for( i=0; i<iter; i++ ){
@@ -19,9 +19,9 @@ zVecWrite(x);
     for( j=0; ; j++ ){
       f( f0, f1, util );
 printf("f1: "); zVecWrite(f1); getchar();
-      if( j == _zVecSize(x) ) break;
-      zRawVecSub( zVecArray(f1), zVecArray(f0), zMatRowArray(dx,j), _zVecSize(x) );
-      if( zRawVecIsTiny( zMatRowArray(dx,j), _zVecSize(x) ) ){
+      if( j == zVecSizeNC(x) ) break;
+      zRawVecSub( zVecArray(f1), zVecArray(f0), zMatRowArray(dx,j), zVecSizeNC(x) );
+      if( zRawVecIsTiny( zMatRowArray(dx,j), zVecSizeNC(x) ) ){
         zVecCopyNC( f1, x );
         goto TERMINATE;
       }
@@ -33,11 +33,11 @@ printf("f1: "); zVecWrite(f1); getchar();
     }
     l = zVecSqrNorm( f1 );
     for( j=0; j<_zMatRowSize(dx)-1; j++ ){
-      zRawVecSub( zMatRowArray(dx,j+1), zMatRowArray(dx,j), zVecArray(f0), _zVecSize(f0) );
+      zRawVecSub( zMatRowArray(dx,j+1), zMatRowArray(dx,j), zVecArray(f0), zVecSizeNC(f0) );
       zMatSetCol( ddx, j, f0 );
       zMatElem(ddx,j,j) += 1.0;
     }
-    zRawVecSubDRC( zVecArray(f1), zMatRowArray(dx,j), _zVecSize(f1) );
+    zRawVecSubDRC( zVecArray(f1), zMatRowArray(dx,j), zVecSizeNC(f1) );
     zMatSetCol( ddx, j, f1 );
     zMatElem(ddx,j,j) += 1.0;
 

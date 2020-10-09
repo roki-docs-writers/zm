@@ -22,7 +22,7 @@ void test(zMat a, zVec b, zVec w, zVec w2, zVec e, zVec aux)
 
   x1 = zVecAlloc( N );
   x2 = zVecAlloc( N );
-  bb = zVecAlloc( _zVecSize(b) );
+  bb = zVecAlloc( zVecSizeNC(b) );
   zLEAllocWork( &m, &v, &s, &idx, N );
   zVecRand( aux, -10, 10 );
 

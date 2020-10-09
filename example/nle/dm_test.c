@@ -6,7 +6,7 @@ zVec f1(zVec var, zVec r, void *dummy)
 {
   register int i;
 
-  for( i=0; i<_zVecSize(var); i++ )
+  for( i=0; i<zVecSizeNC(var); i++ )
     zVecSetElem( r, i, sin(zVecElem(var,i))+zVecElem(var,i)-0.1*i*zPI );
   return r;
 }
@@ -14,7 +14,7 @@ zMat jac1(zVec var, zMat j, void *dummy)
 {
   register int i;
 
-  for( i=0; i<_zVecSize(var); i++ )
+  for( i=0; i<zVecSizeNC(var); i++ )
     zMatSetElem( j, i, i, cos(zVecElem(var,i))+1 );
   return j;
 }
@@ -23,7 +23,7 @@ zVec f2(zVec var, zVec r, void *dummy)
 {
   register int i;
 
-  for( i=0; i<_zVecSize(var); i++ )
+  for( i=0; i<zVecSizeNC(var); i++ )
     zVecSetElem( r, i, exp(zVecElem(var,i)-0.01*i)-1 );
   return r;
 }
@@ -31,7 +31,7 @@ zMat jac2(zVec var, zMat j, void *dummy)
 {
   register int i;
 
-  for( i=0; i<_zVecSize(var); i++ )
+  for( i=0; i<zVecSizeNC(var); i++ )
     zMatSetElem( j, i, i, exp(zVecElem(var,i)-0.01*i) );
   return j;
 }
@@ -40,7 +40,7 @@ zVec f3(zVec var, zVec r, void *dummy)
 {
   register int i;
 
-  for( i=0; i<_zVecSize(var); i++ )
+  for( i=0; i<zVecSizeNC(var); i++ )
     zVecSetElem( r, i, log(zVecElem(var,i)+i+1) );
   return r;
 }
@@ -48,7 +48,7 @@ zMat jac3(zVec var, zMat j, void *dummy)
 {
   register int i;
 
-  for( i=0; i<_zVecSize(var); i++ )
+  for( i=0; i<zVecSizeNC(var); i++ )
     zMatSetElem( j, i, i, 1.0/(zVecElem(var,i)+i+1) );
   return j;
 }
@@ -58,7 +58,7 @@ zVec f4(zVec var, zVec r, void *dummy)
   register int i;
   double x;
 
-  for( i=0; i<_zVecSize(var); i++ ){
+  for( i=0; i<zVecSizeNC(var); i++ ){
     x = zVecElem(var,i);
     zVecSetElem( r, i, (x-10.0*i)*(x*x+x+1)*(x*x-x+1) );
   }
@@ -69,7 +69,7 @@ zMat jac4(zVec var, zMat j, void *dummy)
   register int i;
   double x;
 
-  for( i=0; i<_zVecSize(var); i++ ){
+  for( i=0; i<zVecSizeNC(var); i++ ){
     x = zVecElem(var,i);
     zMatSetElem( j, i, i, (x*x+x+1)*(x*x-x+1)+2*x*(x-10.0*i)*(2*x*x+1) );
   }
@@ -111,7 +111,7 @@ zVec f6(zVec var, zVec r, void *dummy)
 {
   register int i;
 
-  for( i=0; i<_zVecSize(var); i++ )
+  for( i=0; i<zVecSizeNC(var); i++ )
     zVecSetElem( r, i, zVecElem(var,i)-3*i );
   return r;
 }
@@ -119,7 +119,7 @@ zMat jac6(zVec var, zMat j, void *dummy)
 {
   register int i;
 
-  for( i=0; i<_zVecSize(var); i++ )
+  for( i=0; i<zVecSizeNC(var); i++ )
     zMatSetElem( j, i, i, 1 );
   return j;
 }

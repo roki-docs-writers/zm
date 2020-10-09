@@ -79,9 +79,9 @@ __EXPORT void zNURBSDestroy(zNURBS *nurbs);
 
 /*! \brief normalize the knot vector of a NURBS interpolator.
  *
- * zNURBsKnotNormalize() normalizes the knot vector of a NURBS interpolator
- * \a nurbs so that it starts from 0 and ends at 1 by using zNURBSKnot0
- * and zNURBSKnotE.
+ * zNURBsKnotNormalize() normalizes the knot vector of a NURBS
+ * interpolator \a nurbs so that it starts from 0 and ends at 1
+ * by using zNURBSKnot0 and zNURBSKnotE.
  */
 __EXPORT void zNURBSKnotNormalize(zNURBS *nurbs);
 
@@ -97,9 +97,20 @@ __EXPORT zVec zNURBSVec(zNURBS *nurbs, double t, zVec v);
 
 /*! \brief zNURBSVecDiff
  *
- * zNURBSVecDiff() computes a differential of an interpolated vector by a NURBS interpolator
+ * zNURBSVecDiff() computes a differential of an interpolated vector
+ * by a NURBS interpolator
  */
 __EXPORT zVec zNURBSVecDiff(zNURBS *nurbs, double t, zVec v, int diff);
+
+/*! \brief nearest neighbor on NURBS
+ *
+ * zNURBSVecNN() finds the nearest-neighbor vector on a NURBS curve
+ * defined by \a nurbs from a vector \a v. The result is put into \a nn.
+ * \return
+ * zNURBSVecNN() returns the parameter corresponding to the nearest-
+ * neighbor vector found by this function.
+ */
+__EXPORT double zNURBSVecNN(zNURBS *nurbs, zVec v, zVec nn);
 
 /* for debug */
 

@@ -1,26 +1,35 @@
 #include <zm/zm_nurbs.h>
 
 #define STEP 100
+#define N     50
 
-void test_weight(zNURBS *nurbs, int w)
+void test(zNURBS *nurbs)
 {
-  double t;
-  int i;
+  register int i;
   FILE *fp;
-  char filename[BUFSIZ];
-  zVec v;
+  zVec v, nn;
 
-  sprintf( filename, "w%d", w );
-  fp = fopen( filename, "w" );
-  zNURBSWeight(nurbs,4) = (double)w;
   v = zVecAlloc( zVecSizeNC(zListHead(nurbs->seq)->data.v) );
+  nn = zVecAlloc( zVecSizeNC(zListHead(nurbs->seq)->data.v) );
+
+  fp = fopen( "p", "w" );
   for( i=0; i<=STEP; i++ ){
-    t = ( zNURBSKnotE(nurbs)-zNURBSKnot0(nurbs) ) * i / STEP + zNURBSKnot0(nurbs);
-    if( zNURBSVec( nurbs, t, v ) )
+    if( zNURBSVec( nurbs, (double)i/STEP, v ) )
       zVecDataFWrite( fp, v );
   }
-  zVecFree( v );
   fclose( fp );
+  fp = fopen( "nn", "w" );
+  for( i=0; i<N; i++ ){
+    zVecSetElemList( v, zRandF(-1,7), zRandF(-3,5) );
+    zNURBSVecNN( nurbs, v, nn );
+    zVecDataFWrite( fp, v );
+    zVecDataFWrite( fp, nn );
+    fprintf( fp, "\n" );
+  }
+  fclose( fp );
+
+  zVecFree( v );
+  zVecFree( nn );
 }
 
 void output_src(zSeq *seq)
@@ -34,19 +43,19 @@ void output_src(zSeq *seq)
   fclose( fp );
 }
 
-#define DIM 4
+#define DIM 3
 
 int main(int argc, char *argv[])
 {
   zNURBS nurbs;
   zSeq seq;
   zVec v;
-  int dim, num, i;
+  int num, i;
   /* example data array */
   double xp[] = { 2.0, 3.0, 5.0, 4.0, 5.0, 7.0 };
   double yp[] = { 3.0,-1.0,-2.0, 0.0, 4.0, 1.5 };
 
-  dim = argc > 1 ? atoi(argv[1]) : DIM;
+  zRandInit();
   /* creation of x-values and y-values vector */
   num = sizeof(xp) / sizeof(double);
   zListInit( &seq );
@@ -57,9 +66,9 @@ int main(int argc, char *argv[])
   output_src( &seq );
 
   /* creation of spline interpolator */
-  if( zNURBSCreate( &nurbs, &seq, dim ) ){
-    for( i=0; i<5; i++ )
-      test_weight( &nurbs, i );
+  if( zNURBSCreate( &nurbs, &seq, DIM ) ){
+    zNURBSKnotNormalize( &nurbs );
+    test( &nurbs );
     zNURBSDestroy( &nurbs );
   }
   zSeqFree( &seq );

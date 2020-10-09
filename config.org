@@ -1,6 +1,6 @@
 # dependency
-# CURE-1.0.0-beta3
+# CURE-1.0.0-beta4
 
 PREFIX=$(HOME)/usr
 PROJNAME=zm
-VERSION=1.0.0-beta3
+VERSION=1.0.0-beta4

@@ -4,7 +4,7 @@ zVec f1(zVec var, zVec r, void *dummy)
 {
   register int i;
 
-  for( i=0; i<_zVecSize(var); i++ )
+  for( i=0; i<zVecSizeNC(var); i++ )
     zVecSetElem( r, i, sin(zVecElem(var,i))+zVecElem(var,i)-0.1*i*zPI );
   return r;
 }
@@ -12,7 +12,7 @@ zMat jac1(zVec var, zMat j, void *dummy)
 {
   register int i;
 
-  for( i=0; i<_zVecSize(var); i++ )
+  for( i=0; i<zVecSizeNC(var); i++ )
     zMatSetElem( j, i, i, cos(zVecElem(var,i))+1 );
   return j;
 }
@@ -27,7 +27,7 @@ int NLESolveLM(zVec var, int nc, zVec (* f)(zVec,zVec,void*), zMat (* j)(zVec,zM
 
   x = zVecCopy( var );
   r = zVecAlloc( nc );
-  jac = zMatAlloc( nc, _zVecSize(var) );
+  jac = zMatAlloc( nc, zVecSizeNC(var) );
   _j = zMatAllocSqr( nc );
   ZITERINIT( iternum );
   for( i=0; i<iternum; i++ ){

@@ -7,7 +7,7 @@ void test(zMat m, zVec eig, zMat r, int n)
 
   e = zVecAlloc( _zMatRowSize(m) );
   ev= zVecAlloc( _zMatRowSize(r) );
-  for( i=0; i<_zVecSize(eig); i++ ){
+  for( i=0; i<zVecSizeNC(eig); i++ ){
     zMatGetCol( r, i, ev );
     printf( "eig#%d:\n", i );
     printf( " eig-value = %g\n", zVecElem(eig,i) );

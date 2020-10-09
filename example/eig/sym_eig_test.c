@@ -6,9 +6,9 @@ void check(zMat m, zVec s, zMat r, int c)
   zVec v, e;
   register int i;
 
-  v = zVecAlloc( _zVecSize(s) );
-  e = zVecAlloc( _zVecSize(s) );
-  for( i=0; i<_zVecSize(s); i++ ){
+  v = zVecAlloc( zVecSizeNC(s) );
+  e = zVecAlloc( zVecSizeNC(s) );
+  for( i=0; i<zVecSizeNC(s); i++ ){
     zMatGetCol( r, i, v );
     zMulMatVec( m, v, e );
     zVecCatDRC( e, -zVecElem(s,i), v );

@@ -7,7 +7,7 @@ double eval(zVec v, void *dummy)
   register int i;
   double result = 0;
 
-  for( i=0; i<_zVecSize(v); i++ )
+  for( i=0; i<zVecSizeNC(v); i++ )
     result += zSqr( zVecElem(v,i) - 10*i );
   return result;
 }

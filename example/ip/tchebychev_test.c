@@ -89,8 +89,8 @@ bool zIPCreateTchebychev(zIP *ip, zSeq *seq)
   if( !zIPDataAlloc( &ip->dat, seq ) ) return false;
   cp = zListHead(seq);
   r = zMatAllocSqr( zIPSize(&ip->dat) );
-  p = zMatAlloc( zIPSize(&ip->dat), _zVecSize(cp->data.v) );
-  v = zMatAlloc( zIPSize(&ip->dat), _zVecSize(cp->data.v) );
+  p = zMatAlloc( zIPSize(&ip->dat), zVecSizeNC(cp->data.v) );
+  v = zMatAlloc( zIPSize(&ip->dat), zVecSizeNC(cp->data.v) );
   if( !r || !p || !v ){
     ZALLOCERROR();
     ret = false;

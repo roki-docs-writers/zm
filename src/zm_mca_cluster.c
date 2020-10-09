@@ -56,10 +56,7 @@ void zClusterFWrite(FILE *fp, zCluster *c)
  */
 void zClusterDataFWrite(FILE *fp, zCluster *c)
 {
-  zVecListCell *vc;
-
-  zListForEach( &c->vl, vc )
-    zVecDataFWrite( fp, vc->data );
+  zVecListFWrite( fp, &c->vl );
 }
 
 /* ********************************************************** */

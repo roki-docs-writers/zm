@@ -33,20 +33,19 @@ bool zNURBSCreate(zNURBS *nurbs, zSeq *seq, int dim)
     return false;
   }
   nurbs->seq = seq;
-  /* initialize knot vector */
-  for( i=0; i<dim; i++ )
-    zNURBSKnot(nurbs,i) = 0;
-  for( j=1; i<=zListNum(seq); i++, j++ )
-    zNURBSKnot(nurbs,i) =  j;
-  for( ; i<zVecSizeNC(nurbs->knot); i++ )
-    zNURBSKnot(nurbs,i) = j;
-  /* assign control points & initialize weight uniformly */
+  /* set knots & assign control points & initialize weight uniformly */
+  for( j=0; j<dim; j++ )
+    zNURBSKnot(nurbs,j) = 0;
   i = 0;
-  zListForEach( seq, cp ){
+  zListForEachRew( seq, cp ){
     zNURBSWeight(nurbs,i) = 1.0;
     zNURBSCP(nurbs,i) = cp->data.v;
+    zNURBSKnot(nurbs,j) = zNURBSKnot(nurbs,j-1) + cp->data.dt;
+    j++;
     i++;
   }
+  for( ; j<zVecSizeNC(nurbs->knot); j++ )
+    zNURBSKnot(nurbs,j) = zNURBSKnot(nurbs,j-1);
   return true;
 }
 
@@ -79,8 +78,8 @@ int _zNURBSSeg(zNURBS *nurbs, double t)
 {
   register int i, j, k;
 
-  if( t <  zNURBSKnot0(nurbs) ) return -1;
-  if( t >  zNURBSKnotE(nurbs) ) return -2;
+  if( t <= zNURBSKnot0(nurbs) ) return -1;
+  if( t >= zNURBSKnotE(nurbs) ) return -2;
   for( i=0, j=zVecSizeNC(nurbs->knot)-1; ; ){
     while( zNURBSKnot(nurbs,i+1) == zNURBSKnot(nurbs,i) && i < j ) i++;
     while( zNURBSKnot(nurbs,j-1) == zNURBSKnot(nurbs,j) && j > i ) j--;
@@ -222,6 +221,41 @@ zVec zNURBSVecDiff(zNURBS *nurbs, double t, zVec v, int diff)
   den = _zNURBSDenDiff( nurbs, t_tmp, s, e, 0 );
   return zIsTiny(den) ?
     zVecCopy( zNURBSCP(nurbs,0), v ) : zVecDivDRC( v, den );
+}
+
+/* nearest neighbor on NURBS */
+#define ZNURBS_NN_DIV 21
+double zNURBSVecNN(zNURBS *nurbs, zVec v, zVec nn)
+{
+  double s1, s2, s1old, s2old, si;
+  double d, dmin1, dmin2;
+  zVec vs;
+  register int i;
+
+  if( !( vs = zVecAlloc( zVecSizeNC(v) ) ) )
+    return zNURBSKnot0(nurbs); /* dummy */
+  s1 = zNURBSKnot0(nurbs);
+  s2 = zNURBSKnotE(nurbs);
+  dmin1 = dmin2 = HUGE_VAL;
+  do{
+    s1old = s1;
+    s2old = s2;
+    for( i=0; i<ZNURBS_NN_DIV; i++ ){
+      si = (s2old-s1old)*i/ZNURBS_NN_DIV + s1old;
+      zNURBSVec( nurbs, si, vs );
+      if( ( d = zVecDist( v, vs ) ) <= dmin1 ){
+        dmin2 = dmin1; s2 = s1;
+        dmin1 = d;     s1 = si;
+      } else
+      if( d <= dmin2 ){
+        dmin2 = d;
+        s2 = si;
+      }
+    }
+  } while( !zIsTiny( s1 - s2 ) && !zIsTiny( dmin1 - dmin2 ) );
+  zNURBSVec( nurbs, ( si = 0.5*(s1+s2) ), nn );
+  zVecFree( vs );
+  return si;
 }
 
 /* for debug */

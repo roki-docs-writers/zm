@@ -20,7 +20,6 @@ int main(int argc, char *argv[])
     ZOPENERROR( argv[1] );
     return 1;
   }
-  
 
   a = zMatCloneArray( a_arr, row, col );
   b = zVecCloneArray( b_arr, row );
@@ -44,7 +43,7 @@ int main(int argc, char *argv[])
   printf( "cost=%f\n", cost );
   printf( "<true answer>\n" );
   zVecWrite( &ans );
-  printf( "cost=%f\n", zRawVecInnerProd( answer, zVecBuf(c), _zVecSize(&ans) ) );
+  printf( "cost=%f\n", zRawVecInnerProd( answer, zVecBuf(c), zVecSizeNC(&ans) ) );
 
   zMatFree( a );
   zVecFree( b );
