@@ -1,18 +1,19 @@
 /* ZM - Z's Mathematics Toolbox
  * Copyright (C) 1998 Tomomichi Sugihara (Zhidao)
  *
- * zm_nurbs - NURBS interpolation.
+ * zm_nurbs - NURBS curve.
  */
 
 #include <zm/zm_nurbs.h>
 
 static int _zNURBSSeg(zNURBS *nurbs, double t);
+
 static double _zNURBSBasis(zNURBS *nurbs, double t, int i, int r, int k);
 static double _zNURBSBasisDiff(zNURBS *nurbs, double t, int i, int r, int k, int diff);
 static double _zNURBSDenDiff(zNURBS *nurbs, double t, int s, int e, int diff);
 
 /* zNURBSCreate
- * - create a NURBS interpolator.
+ * - create a NURBS curve.
  */
 bool zNURBSCreate(zNURBS *nurbs, zSeq *seq, int dim)
 {
@@ -50,7 +51,7 @@ bool zNURBSCreate(zNURBS *nurbs, zSeq *seq, int dim)
 }
 
 /* zNURBSDestroy
- * - destroy a NURBS interpolator.
+ * - destroy a NURBS curve.
  */
 void zNURBSDestroy(zNURBS *nurbs)
 {
@@ -62,7 +63,7 @@ void zNURBSDestroy(zNURBS *nurbs)
 }
 
 /* zNURBSKnotNormalize
- * - normalize the knot vector of a NURBS interpolator.
+ * - normalize the knot vector of a NURBS curve.
  */
 void zNURBSKnotNormalize(zNURBS *nurbs)
 {
@@ -72,13 +73,13 @@ void zNURBSKnotNormalize(zNURBS *nurbs)
 
 /* (static)
  * _zNURBSSeg
- * - find the knot segment of interpolation.
+ * - find the knot segment that involves the given parameter.
  */
 int _zNURBSSeg(zNURBS *nurbs, double t)
 {
   register int i, j, k;
 
-  if( t <= zNURBSKnot0(nurbs) ) return -1;
+  if( t < zNURBSKnot0(nurbs) ) return -1;
   if( t >= zNURBSKnotE(nurbs) ) return -2;
   for( i=0, j=zVecSizeNC(nurbs->knot)-1; ; ){
     while( zNURBSKnot(nurbs,i+1) == zNURBSKnot(nurbs,i) && i < j ) i++;
@@ -94,7 +95,7 @@ int _zNURBSSeg(zNURBS *nurbs, double t)
 
 /* (static)
  * _zNURBSBasis
- * - basis function.
+ * - basis function of NURBS.
  */
 double _zNURBSBasis(zNURBS *nurbs, double t, int i, int r, int k)
 {
@@ -118,7 +119,7 @@ double _zNURBSBasis(zNURBS *nurbs, double t, int i, int r, int k)
 }
 
 /* zNURBSVec
- * - compute an interpolated vector by a NURBS interpolator.
+ * - compute a vector on a NURBS curve.
  */
 zVec zNURBSVec(zNURBS *nurbs, double t, zVec v)
 {
@@ -144,7 +145,7 @@ zVec zNURBSVec(zNURBS *nurbs, double t, zVec v)
 
 /* (static)
  * _zNURBSBasisDiff
- * - differential of a basis function.
+ * - derivative of the basis function of NURBS.
  */
 double _zNURBSBasisDiff(zNURBS *nurbs, double t, int i, int r, int k, int diff)
 {
@@ -171,7 +172,7 @@ double _zNURBSBasisDiff(zNURBS *nurbs, double t, int i, int r, int k, int diff)
 
 /* (static)
  * _zNURBSDenDiff
- * - differential of the denominator of NURBS function.
+ * - derivative of the denominator of NURBS.
  */
 double _zNURBSDenDiff(zNURBS *nurbs, double t, int s, int e, int diff)
 {
@@ -184,7 +185,7 @@ double _zNURBSDenDiff(zNURBS *nurbs, double t, int s, int e, int diff)
 }
 
 /* zNURBSVecDiff
- * - compute a differential of an interpolated vector by a NURBS interpolator.
+ * - compute the derivative a NURBS curve.
  */
 zVec zNURBSVecDiff(zNURBS *nurbs, double t, zVec v, int diff)
 {

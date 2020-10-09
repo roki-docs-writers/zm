@@ -17,11 +17,11 @@ enum{
   SEQMOD_APPEND,
 };
 zOption option[] = {
-  { "help", "help",      NULL, "display this messages", NULL, false },
-  { "c", "count",        NULL, "count steps",           NULL, false },
+  { "h", "help",        NULL, "display this messages", NULL, false },
+  { "c", "count",       NULL, "count steps",           NULL, false },
   { "i", "interpolate", "<dt>", "interpolate sequence every dt second", NULL, false },
-  { "r", "reverse",      NULL, "reverse sequence", NULL, false },
-  { "a", "append",       NULL, "append sequences", NULL, false },
+  { "r", "reverse",     NULL, "reverse sequence", NULL, false },
+  { "a", "append",      NULL, "append sequences", NULL, false },
   { NULL, NULL, NULL, NULL, NULL, false },
 };
 
@@ -116,6 +116,7 @@ bool seqmodAppend(zStrList *arglist)
   cell = zListTail(arglist);
   if( !seqmodLoadSequence( cell->data ) )
     return false;
+  cell = zListCellNext(cell);
   zListToHead( arglist, cell ){
     if( !zSeqReadFile( &subseq, cell->data ) ) continue;
     zListAppend( &seq, &subseq );
@@ -128,15 +129,20 @@ bool seqmodAppend(zStrList *arglist)
 bool seqmodOperate(int argc, char *argv[])
 {
   zStrList arglist;
+  bool ret = true;
 
   if( !zOptionRead( option, argv, &arglist ) ) return false;
   if( option[SEQMOD_HELP].flag )
     seqmodUsage();
-  if( option[SEQMOD_APPEND].flag )
-    return seqmodAppend( &arglist );
+  if( option[SEQMOD_APPEND].flag ){
+    ret = seqmodAppend( &arglist );
+  } else
   if( zListIsEmpty(&arglist) ||
-      !seqmodLoadSequence( zListTail(&arglist)->data ) ) exit( 1 );
-  zStrListDestroy( &arglist );
+      !seqmodLoadSequence( zListTail(&arglist)->data ) ){
+    ret = false;
+  }
+  zStrListDestroy( &arglist, false );
+  if( !ret ) return false;
 
   if( option[SEQMOD_COUNT].flag )
     seqmodCount();
