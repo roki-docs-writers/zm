@@ -51,8 +51,9 @@ typedef struct{
 #define zNURBSWeight(n,i)  ( zArrayElem(&(n)->cparray,i)->w )
 #define zNURBSCP(n,i)      ( zArrayElem(&(n)->cparray,i)->cp )
 
+#define zNURBSKnotNum(n)   ( zVecSizeNC((n)->knot) - 1 )
 #define zNURBSKnot0(n)     zNURBSKnot(n,0)
-#define zNURBSKnotE(n)     zNURBSKnot(n,zVecSizeNC((n)->knot)-1)
+#define zNURBSKnotE(n)     zNURBSKnot(n,zNURBSKnotNum(n)-1)
 
 #define zNURBSCPNum(n)     zArrayNum( &(n)->cparray )
 
@@ -119,7 +120,8 @@ __EXPORT double zNURBSVecNN(zNURBS *nurbs, zVec v, zVec nn);
 
 /* for debug */
 
-__EXPORT void zNURBSCPArrayFWrite(FILE *fp, zNURBS *nurbs);
+__EXPORT void zNURBSKnotFWrite(FILE *fp, zNURBS *nurbs);
+__EXPORT void zNURBSCPFWrite(FILE *fp, zNURBS *nurbs);
 
 __END_DECLS
 

@@ -34,7 +34,7 @@ void output_src(zSeq *seq)
   fclose( fp );
 }
 
-#define DIM 4
+#define DIM 3
 
 int main(int argc, char *argv[])
 {
@@ -58,6 +58,7 @@ int main(int argc, char *argv[])
 
   /* creation of spline interpolator */
   if( zNURBSCreate( &nurbs, &seq, dim ) ){
+    zNURBSKnotFWrite( stdout, &nurbs );
     for( i=0; i<5; i++ )
       test_weight( &nurbs, i );
     zNURBSDestroy( &nurbs );

@@ -308,6 +308,9 @@ void zQPSolveASM(zMat q, zVec c, zMat a, zVec b, zVec ans, double *cost, zVec in
   zListForEach( &ilist, idata )
     zIndexFree( idata->data.idx );
   zListDestroy( _zQPASMIndex, &ilist );
+  zIndexFree( idx );
+  zMatFree( qa );
+  zVecFreeAO( 3, xy, cb, d );
 }
 
 /* zCGSolve

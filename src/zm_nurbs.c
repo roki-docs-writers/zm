@@ -35,7 +35,7 @@ bool zNURBSCreate(zNURBS *nurbs, zSeq *seq, int dim)
     return false;
   }
   /* set knots & assign control points & initialize weight uniformly */
-  for( j=0; j<dim; j++ )
+  for( j=0; j<dim/2+1; j++ )
     zNURBSKnot(nurbs,j) = 0;
   i = 0;
   zListForEachRew( seq, cp ){
@@ -46,7 +46,7 @@ bool zNURBSCreate(zNURBS *nurbs, zSeq *seq, int dim)
     j++;
     i++;
   }
-  for( ; j<zVecSizeNC(nurbs->knot); j++ )
+  for( ; j<zNURBSKnotNum(nurbs); j++ )
     zNURBSKnot(nurbs,j) = zNURBSKnot(nurbs,j-1);
   if( !ret )
     zNURBSDestroy( nurbs );
@@ -87,7 +87,7 @@ int _zNURBSSeg(zNURBS *nurbs, double t)
 
   if( t < zNURBSKnot0(nurbs) ) return -1;
   if( t >= zNURBSKnotE(nurbs) ) return -2;
-  for( i=0, j=zVecSizeNC(nurbs->knot)-1; ; ){
+  for( i=0, j=zNURBSKnotNum(nurbs)-1; ; ){
     while( zNURBSKnot(nurbs,i+1) == zNURBSKnot(nurbs,i) && i < j ) i++;
     while( zNURBSKnot(nurbs,j-1) == zNURBSKnot(nurbs,j) && j > i ) j--;
     if( ( k = ( i + j ) / 2 ) == i ) break;
@@ -132,15 +132,14 @@ zVec zNURBSVec(zNURBS *nurbs, double t, zVec v)
   register int s, e, i;
   double b, den;
 
-  zVecClear( v );
-  den = 0;
   s = _zNURBSSeg( nurbs, t );
   if( s == -1 )
     return zVecCopy( zNURBSCP(nurbs,0), v );
   if( s == -2 )
     return zVecCopy( zNURBSCP(nurbs,zNURBSCPNum(nurbs)-1), v );
   e = zMin( s+1, zNURBSCPNum(nurbs) );
-  for( i=zMax(s-nurbs->dim,0); i<e; i++ ){
+  zVecClear( v );
+  for( den=0, i=zMax(s-nurbs->dim,0); i<e; i++ ){
     b = zNURBSWeight(nurbs,i) * _zNURBSBasis(nurbs,t,i,nurbs->dim+1,s);
     den += b;
     zVecCatNCDRC( v, b, zNURBSCP(nurbs,i) );
@@ -155,7 +154,7 @@ zVec zNURBSVec(zNURBS *nurbs, double t, zVec v)
  */
 double _zNURBSBasisDiff(zNURBS *nurbs, double t, int i, int r, int k, int diff)
 {
-  double t1, dt, b=0;
+  double dt, b=0;
 
   if( diff == 0 )
     return _zNURBSBasis( nurbs, t, i, r, k );
@@ -164,16 +163,14 @@ double _zNURBSBasisDiff(zNURBS *nurbs, double t, int i, int r, int k, int diff)
     return NAN;
   }
   if( i > k - r + 1 ){
-    t1 = zNURBSKnot(nurbs,i);
-    if( !zIsTiny( dt = zNURBSKnot(nurbs,i+r-1) - t1 ) )
-      b += ( r - 1 ) / dt * _zNURBSBasisDiff(nurbs,t,i,r-1,k,diff-1);
+    if( !zIsTiny( ( dt = zNURBSKnot(nurbs,i+r-1) - zNURBSKnot(nurbs,i) ) ) )
+      b += _zNURBSBasisDiff(nurbs,t,i,r-1,k,diff-1) / dt;
   }
   if( i <= k ){
-    t1  = zNURBSKnot(nurbs,i+1);
-    if( !zIsTiny( dt = zNURBSKnot(nurbs,i+r) - t1 ) )
-      b -= ( r - 1 ) / dt * _zNURBSBasisDiff(nurbs,t,i+1,r-1,k,diff-1);
+    if( !zIsTiny( ( dt = zNURBSKnot(nurbs,i+r) - zNURBSKnot(nurbs,i+1) ) ) )
+      b -= _zNURBSBasisDiff(nurbs,t,i+1,r-1,k,diff-1) / dt;
   }
-  return b;
+  return b * ( r - 1 );
 }
 
 /* (static)
@@ -196,7 +193,7 @@ double _zNURBSDenDiff(zNURBS *nurbs, double t, int s, int e, int diff)
 zVec zNURBSVecDiff(zNURBS *nurbs, double t, zVec v, int diff)
 {
   register int s, e, i;
-  double den, b, t_tmp;
+  double den, b;
   zVec tmp;
 
   if( diff == 0 )
@@ -210,67 +207,85 @@ zVec zNURBSVecDiff(zNURBS *nurbs, double t, zVec v, int diff)
     return NULL;
   }
   zVecClear( v );
-  den = 0;
-  t_tmp = t;
-  s = _zNURBSSeg( nurbs, t_tmp );
+  s = _zNURBSSeg( nurbs, t );
   if( s == -1 )
-    t_tmp = zNURBSKnot0(nurbs);
+    t = zNURBSKnot0(nurbs);
   else if( s == -2 )
-    t_tmp = zNURBSKnotE(nurbs);
+    t = zNURBSKnotE(nurbs);
   e = zMin( s+1, zNURBSCPNum(nurbs) );
-  for( i=zMax(s-nurbs->dim,0); i<e; i++ ){
-    b = zNURBSWeight(nurbs,i) * _zNURBSBasisDiff(nurbs,t_tmp,i,nurbs->dim+1,s,diff);
+  for( den=0, i=zMax(s-nurbs->dim,0); i<e; i++ ){
+    b = zNURBSWeight(nurbs,i) * _zNURBSBasisDiff(nurbs,t,i,nurbs->dim+1,s,diff);
+    den += zNURBSWeight(nurbs,i) * _zNURBSBasis(nurbs,t,i,nurbs->dim+1,s);
     zVecCatNCDRC( v, b, zNURBSCP(nurbs,i) );
   }
-  for( i=1; i<diff+1; i++ )
-    zVecCatNCDRC( v, -zCombi(diff,i)*_zNURBSDenDiff(nurbs,t,s,e,i), zNURBSVecDiff(nurbs,t_tmp,tmp,diff-i) );
+  for( i=1; i<diff+1; i++ ){
+    if( !zNURBSVecDiff( nurbs, t, tmp, diff-i ) ) break;
+    zVecCatNCDRC( v, -zCombi(diff,i)*_zNURBSDenDiff(nurbs,t,s,e,i), tmp );
+  }
   zVecFree( tmp );
-  den = _zNURBSDenDiff( nurbs, t_tmp, s, e, 0 );
   return zIsTiny(den) ?
     zVecCopy( zNURBSCP(nurbs,0), v ) : zVecDivDRC( v, den );
 }
 
 /* nearest neighbor on NURBS */
-#define ZNURBS_NN_DIV 21
+#define ZNURBS_NN_DIV 30
 double zNURBSVecNN(zNURBS *nurbs, zVec v, zVec nn)
 {
-  double s1, s2, s1old, s2old, si;
+  double s1, s2, s1old, s2old, sj;
   double d, dmin1, dmin2;
   zVec vs;
-  register int i;
+  register int i, j;
+  int iter = 0;
 
   if( !( vs = zVecAlloc( zVecSizeNC(v) ) ) )
     return zNURBSKnot0(nurbs); /* dummy */
   s1 = zNURBSKnot0(nurbs);
   s2 = zNURBSKnotE(nurbs);
   dmin1 = dmin2 = HUGE_VAL;
-  do{
+  ZITERINIT( iter );
+  for( i=0; i<iter; i++ ){
     s1old = s1;
     s2old = s2;
-    for( i=0; i<ZNURBS_NN_DIV; i++ ){
-      si = (s2old-s1old)*i/ZNURBS_NN_DIV + s1old;
-      zNURBSVec( nurbs, si, vs );
-      if( ( d = zVecDist( v, vs ) ) <= dmin1 ){
+    for( j=0; j<=ZNURBS_NN_DIV; j++ ){
+      sj = (s2old-s1old)*j/ZNURBS_NN_DIV + s1old;
+      zNURBSVec( nurbs, sj, vs );
+      d = zVecDist( v, vs );
+      if( d < dmin1 ){
         dmin2 = dmin1; s2 = s1;
-        dmin1 = d;     s1 = si;
+        dmin1 = d;     s1 = sj;
       } else
-      if( d <= dmin2 ){
+      if( d < dmin2 ){
         dmin2 = d;
-        s2 = si;
+        s2 = sj;
       }
     }
-  } while( !zIsTiny( s1 - s2 ) && !zIsTiny( dmin1 - dmin2 ) );
-  zNURBSVec( nurbs, ( si = 0.5*(s1+s2) ), nn );
+    if( zIsTiny( s1 - s2 ) || zIsTiny( dmin1 - dmin2 ) ) break;
+  }
+  zNURBSVec( nurbs, ( sj = 0.5*(s1+s2) ), nn );
   zVecFree( vs );
-  return si;
+  return sj;
 }
 
 /* for debug */
 
-/* zNURBSCPArrayFWrite
- * - output an array of control points.
+/* zNURBSKnotFWrite
+ * - output knots of a NURBS curve.
  */
-void zNURBSCPArrayFWrite(FILE *fp, zNURBS *nurbs)
+void zNURBSKnotFWrite(FILE *fp, zNURBS *nurbs)
+{
+  register int i;
+
+  fprintf( fp, "[" );
+  for( i=0; i<zNURBSKnotNum(nurbs); i++ ){
+    fprintf( fp, " %g", zNURBSKnot(nurbs,i) );
+  }
+  fprintf( fp, " ]\n" );
+}
+
+/* zNURBSCPFWrite
+ * - outpu control points of a NURBS curve.
+ */
+void zNURBSCPFWrite(FILE *fp, zNURBS *nurbs)
 {
   register int i;
 
